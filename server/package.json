@@ -8,11 +8,15 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "mongoose": "^9.0.2",
     "twilio": "^5.11.1"
+  },
+  "description": "",
+  "devDependencies": {
+    "nodemon": "^3.1.11"
   }
 }
