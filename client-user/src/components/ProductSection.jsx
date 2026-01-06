@@ -8,7 +8,7 @@ const ProductSection = () => {
 
   const [products, setProducts] = useState([]);
   const [showLeft, setShowLeft] = useState(false);
-  const [showRight, setShowRight] = useState(true);
+  const [showRight, setShowRight] = useState(false);
 
   const updateArrows = () => {
     const el = sliderRef.current;
@@ -64,19 +64,17 @@ const ProductSection = () => {
           <button
             onClick={scrollLeft}
             className="
-              hidden md:flex
-              items-center justify-center
-              absolute -left-6
+              flex items-center justify-center
+              absolute left-1 sm:-left-4
               top-1/2 -translate-y-1/2
               z-10
-              w-12 h-12
-              bg-white
-              border
-              rounded-full
-              shadow-lg
+              w-8 h-8 sm:w-8 sm:h-8
+              bg-white border rounded-full shadow-sm
+              hover:scale-105 transition
             "
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={20} className="sm:hidden" />
+            <ChevronLeft size={22} className="hidden sm:block" />
           </button>
         )}
 
@@ -84,7 +82,12 @@ const ProductSection = () => {
         <div
           ref={sliderRef}
           onScroll={updateArrows}
-          className="flex gap-4 overflow-hidden scroll-smooth"
+          className="
+            flex gap-4
+            overflow-x-auto overflow-y-hidden
+            scroll-smooth
+            scrollbar-hide
+          "
         >
           {products.map((product) => (
             <ProductCard key={product._id} product={product} />
@@ -96,19 +99,17 @@ const ProductSection = () => {
           <button
             onClick={scrollRight}
             className="
-              hidden md:flex
-              items-center justify-center
-              absolute -right-6
+              flex items-center justify-center
+              absolute right-1 sm:-right-4
               top-1/2 -translate-y-1/2
               z-10
-              w-12 h-12
-              bg-white
-              border
-              rounded-full
-              shadow-lg
+              w-8 h-8 sm:w-8 sm:h-8
+              bg-white border rounded-full shadow-sm
+              hover:scale-105 transition
             "
           >
-            <ChevronRight size={24} />
+            <ChevronRight size={20} className="sm:hidden" />
+            <ChevronRight size={22} className="hidden sm:block" />
           </button>
         )}
       </div>

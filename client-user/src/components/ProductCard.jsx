@@ -1,4 +1,9 @@
+import { useCart } from "../context/CartContext";
+
 const ProductCard = ({ product }) => {
+  const { cart, addToCart, removeFromCart } = useCart();
+  const quantity = cart[product.id]?.cartQty || 0;
+
   return (
     <div className="min-w-[180px] max-w-[180px] bg-white border rounded-xl p-3 flex-shrink-0">
       {/* Image */}
@@ -16,9 +21,30 @@ const ProductCard = ({ product }) => {
       <div className="flex items-center justify-between">
         <span className="font-semibold text-sm">₹{product.price}</span>
 
-        <button className="h-8 px-3 border border-green-600 text-green-600 rounded-lg text-sm">
-          ADD
-        </button>
+        {quantity === 0 ? (
+          <button
+            onClick={() => addToCart(product)}
+            className="px-4 py-1 border border-green-600 text-green-600 rounded-lg text-sm font-medium"
+          >
+            ADD
+          </button>
+        ) : (
+          <div className="flex items-center border border-green-600 rounded-lg bg-green-700 text-white">
+            <button
+              onClick={() => removeFromCart(product)}
+              className="px-2 py-1 font-bold"
+            >
+              -
+            </button>
+            <span className="px-2 text-sm font-semibold">{quantity}</span>
+            <button
+              onClick={() => addToCart(product)}
+              className="px-2 py-1 font-bold"
+            >
+              +
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
