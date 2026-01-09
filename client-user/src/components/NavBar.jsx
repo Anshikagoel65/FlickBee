@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, MapPin, ChevronDown, User } from "lucide-react";
+import { Search, MapPin, ChevronDown, User, ShoppingCart } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import LocationModal from "./LocationModal";
@@ -9,6 +9,7 @@ import CartDrawer from "./CartDrawer";
 import { useLocationContext } from "../context/LocationContext";
 import { useAuthContext } from "../context/AuthContext";
 import { useSearch } from "../context/SearchContext";
+import { useCart } from "../context/CartContext";
 
 const NavBar = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -19,6 +20,16 @@ const NavBar = () => {
 
   const { searchQuery, setSearchQuery } = useSearch();
   const { addRecentSearch } = useSearch();
+  const { cart } = useCart();
+
+  const cartItems = Object.values(cart);
+
+  const cartCount = cartItems.reduce((sum, item) => sum + item.cartQty, 0);
+
+  const cartTotal = cartItems.reduce(
+    (sum, item) => sum + item.price * item.cartQty,
+    0
+  );
 
   const { address, deliveryTime, setIsModalOpen, isModalOpen } =
     useLocationContext();
@@ -28,7 +39,7 @@ const NavBar = () => {
 
   return (
     <>
-      <nav className="w-full bg-white shadow-md z-50">
+      <nav className="fixed top-0 left-0 w-full bg-white shadow-md z-50">
         {/* ================= DESKTOP ================= */}
         {isSearchPage ? (
           /* 🔍 SEARCH PAGE – DESKTOP ONLY */
@@ -64,9 +75,16 @@ const NavBar = () => {
             {/* Cart */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg"
+              className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
             >
-              Cart
+              <ShoppingCart size={25} />
+
+              {cartCount > 0 && (
+                <div className="flex flex-col items-end leading-tight">
+                  <span className="text-sm font-bold">{cartCount} items</span>
+                  <span className="text-xs font-bold">₹{cartTotal}</span>
+                </div>
+              )}
             </button>
           </div>
         ) : (
@@ -128,9 +146,16 @@ const NavBar = () => {
 
               <button
                 onClick={() => setIsCartOpen(true)}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg"
+                className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
               >
-                Cart
+                <ShoppingCart size={25} />
+
+                {cartCount > 0 && (
+                  <div className="flex flex-col items-end leading-tight">
+                    <span className="text-sm font-bold">{cartCount} items</span>
+                    <span className="text-sm font-bold">₹{cartTotal}</span>
+                  </div>
+                )}
               </button>
             </div>
           </div>

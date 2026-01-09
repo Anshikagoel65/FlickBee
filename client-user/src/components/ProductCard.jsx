@@ -7,19 +7,26 @@ const ProductCard = ({ product }) => {
   return (
     <div className="min-w-[180px] max-w-[180px] bg-white border rounded-xl p-3 flex-shrink-0">
       {/* Image */}
-      <div className="h-36 bg-gray-200 rounded-lg mb-3 flex items-center justify-center">
-        <span className="text-gray-400 text-sm">Image</span>
+      <div className="h-36 bg-gray-200 rounded-lg mb-3 overflow-hidden">
+        <img
+          src={`http://localhost:5000${product.image}`}
+          alt={product.name}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.target.src = "/placeholder.png"; // optional fallback
+          }}
+        />
       </div>
 
       {/* Title */}
-      <h3 className="text-sm font-medium mb-1 truncate">{product.name}</h3>
+      <h3 className="text-base font-semibold mb-1 truncate">{product.name}</h3>
 
       {/* Quantity */}
-      <p className="text-xs text-gray-500 mb-2">Qty: {product.quantity}</p>
+      <p className="text-sm text-gray-500 mt-4 mb-4">{product.quantity}</p>
 
       {/* Price + Button */}
       <div className="flex items-center justify-between">
-        <span className="font-semibold text-sm">₹{product.price}</span>
+        <span className="font-medium text-sm">₹{product.price}</span>
 
         {quantity === 0 ? (
           <button

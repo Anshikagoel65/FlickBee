@@ -8,7 +8,9 @@ function App() {
   return (
     <BrowserRouter>
       <NavBar />
-      <div style={{ marginTop: "10px" }}>
+
+      {/* OFFSET FOR FIXED NAVBAR */}
+      <div className="pt-[70px] md:pt-[80px]">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<Search />} />

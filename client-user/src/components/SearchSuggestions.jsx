@@ -31,7 +31,14 @@ const SearchSuggestions = () => {
           className="flex items-center gap-3 py-2 cursor-pointer hover:bg-gray-50 rounded-lg"
         >
           <div className="w-8 h-8 bg-gray-200 rounded flex items-center justify-center text-xs">
-            Img
+            <img
+              src={`http://localhost:5000${item.image}`}
+              alt={item.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.src = "/placeholder.png"; // optional fallback
+              }}
+            />
           </div>
           <span className="text-sm">{item.name}</span>
         </div>

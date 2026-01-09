@@ -9,6 +9,11 @@ const userRoutes = require("./routes/user.routes");
 
 const app = express();
 
+const path = require("path");
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/api/categories", require("./routes/categoryRoutes"));
+
 // Middleware
 app.use(
   cors({
@@ -22,7 +27,6 @@ app.use(express.json());
 // Routes
 app.use("/api/admin", adminRoutes);
 app.use("/api", userRoutes);
-
 // DB Connection
 connectDB();
 
