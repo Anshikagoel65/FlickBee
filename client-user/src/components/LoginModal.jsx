@@ -1,24 +1,68 @@
 import { useState } from "react";
 import { useAuthContext } from "../context/AuthContext";
+import { sendOtp, verifyOtp } from "../services/authApi";
+import toast from "react-hot-toast";
 
 const LoginModal = () => {
-  const { setIsLoginOpen } = useAuthContext();
+  const { login, setIsLoginOpen, user } = useAuthContext();
 
   const [step, setStep] = useState("phone");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(30);
+  console.log("USER FROM AUTH CONTEXT:", user);
 
-  const sendOtp = () => {
-    if (phone.length !== 10) return alert("Enter valid mobile number");
-    setStep("otp");
-    startTimer();
+  const handleSendOtp = async () => {
+    if (phone.length !== 10) {
+      toast.error("Enter a valid mobile number");
+      return;
+    }
+
+    const loadingToast = toast.loading("Sending OTP...");
+
+    try {
+      await sendOtp(`+91${phone}`);
+      toast.success("OTP sent successfully 📩", { id: loadingToast });
+      setStep("otp");
+      startTimer();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to send OTP", {
+        id: loadingToast,
+      });
+    }
   };
 
-  const verifyOtp = () => {
-    if (otp.length !== 6) return alert("Enter valid OTP");
-    alert("Login successful ✅");
-    setIsLoginOpen(false);
+  const handleVerifyOtp = async () => {
+    if (otp.length !== 6) {
+      toast.error("Enter valid OTP");
+      return;
+    }
+
+    const toastId = toast.loading("Verifying OTP...");
+
+    try {
+      const res = await verifyOtp(`+91${phone}`, otp);
+
+      // ✅ IMPORTANT
+      console.log("VERIFY OTP RESPONSE 👉", res.data);
+
+      const { token, phone: userPhone } = res.data;
+
+      if (!token) {
+        console.error("❌ Token missing in response");
+        return;
+      }
+
+      login(token, userPhone);
+
+      toast.success("Successfully logged in 🎉", { id: toastId });
+
+      setTimeout(() => {
+        setIsLoginOpen(false);
+      }, 1000);
+    } catch (err) {
+      toast.error("Invalid OTP", { id: toastId });
+    }
   };
 
   const startTimer = () => {
@@ -62,7 +106,7 @@ const LoginModal = () => {
             />
 
             <button
-              onClick={sendOtp}
+              onClick={handleSendOtp}
               className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold"
             >
               Send OTP
@@ -88,7 +132,7 @@ const LoginModal = () => {
             />
 
             <button
-              onClick={verifyOtp}
+              onClick={handleVerifyOtp}
               className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold"
             >
               Verify OTP

@@ -13,21 +13,40 @@ const Section = require("../models/section");
 const Product = require("../models/Product");
 
 /* CREATE PRODUCT */
-router.post("/products", upload.single("image"), async (req, res) => {
+router.post("/products", upload.array("images", 5), async (req, res) => {
   try {
-    const { name, price, quantity, category } = req.body;
+    const {
+      name,
+      description,
+      category,
+      productType,
+      price,
+      mrp,
+      quantity,
+      unit,
+    } = req.body;
+
+    const images = req.files?.map(
+      (file) => `/uploads/products/${file.filename}`
+    );
 
     const product = await Product.create({
       name,
-      price,
-      quantity,
+      description,
       category,
-      image: req.file ? `/uploads/products/${req.file.filename}` : "",
+      productType,
+      price,
+      mrp,
+      quantity: JSON.parse(quantity), // IMPORTANT
+      unit: JSON.parse(unit), // IMPORTANT
+      images,
+      thumbnail: images[0],
+      status: "active",
     });
 
     res.status(201).json(product);
   } catch (err) {
-    res.status(500).json({ message: "Failed to create product" });
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -36,37 +55,43 @@ router.get("/products", async (req, res) => {
   try {
     const { category } = req.query;
 
-    const filter = category ? { category } : {};
-    const products = await Product.find(filter);
+    const filter = {
+      status: "active",
+      ...(category && { category }),
+    };
 
+    const products = await Product.find(filter).populate("category");
     res.json(products);
   } catch (err) {
-    res.status(500).json({ message: "Failed to fetch products" });
+    res.status(500).json({ message: err.message });
   }
 });
 
-router.put("/products/:id", upload.single("image"), async (req, res) => {
+router.put("/products/:id", upload.array("images", 5), async (req, res) => {
   try {
-    const { name, price, quantity, category } = req.body;
+    const updateData = { ...req.body };
 
-    const updateData = {
-      name,
-      price,
-      quantity,
-      category,
-    };
+    if (updateData.quantity)
+      updateData.quantity = JSON.parse(updateData.quantity);
 
-    if (req.file) {
-      updateData.image = `/uploads/products/${req.file.filename}`;
+    if (updateData.unit) updateData.unit = JSON.parse(updateData.unit);
+
+    if (req.files?.length) {
+      const images = req.files.map(
+        (file) => `/uploads/products/${file.filename}`
+      );
+      updateData.images = images;
+      updateData.thumbnail = images[0];
     }
 
     const updated = await Product.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
+      runValidators: true,
     });
 
     res.json(updated);
   } catch (err) {
-    res.status(500).json({ message: "Failed to update product" });
+    res.status(500).json({ message: err.message });
   }
 });
 

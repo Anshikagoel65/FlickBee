@@ -1,11 +1,57 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {
+  MapPin,
+  X,
+  Home,
+  Building2,
+  Pencil,
+  Trash2,
+  MoreVertical,
+} from "lucide-react";
+
 import { useLocationContext } from "../context/LocationContext";
-import { X, Search, MapPin, Crosshair } from "lucide-react";
+import AddressModal from "./AddressModal";
+import { getAddresses, deleteAddress } from "../services/addressApi";
+import { useAuthContext } from "../context/AuthContext";
+
+/* ✅ MOVE THIS HERE (GLOBAL) */
+const getTypeIcon = (type) => {
+  switch (type) {
+    case "home":
+      return <Home size={18} className="text-green-600" />;
+    case "work":
+      return <Building2 size={18} className="text-blue-600" />;
+    default:
+      return <MapPin size={18} className="text-gray-600" />;
+  }
+};
 
 const LocationModal = () => {
   const { setAddress, setDeliveryTime, setIsModalOpen } = useLocationContext();
-  const [input, setInput] = useState("");
+  const { user } = useAuthContext();
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [editData, setEditData] = useState(null);
 
+  const [input, setInput] = useState("");
+  const [savedAddresses, setSavedAddresses] = useState([]);
+
+  const hasSavedAddresses = savedAddresses.length > 0;
+
+  /* 🔹 LOAD SAVED ADDRESSES */
+  const loadAddresses = async () => {
+    try {
+      const res = await getAddresses();
+      setSavedAddresses(res.data || []);
+    } catch (err) {
+      console.error("Failed to load saved addresses", err);
+    }
+  };
+
+  useEffect(() => {
+    if (user) loadAddresses();
+  }, [user]);
+
+  /* 📍 DETECT LOCATION */
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {
       alert("Geolocation not supported");
@@ -27,15 +73,14 @@ const LocationModal = () => {
           data.address.city || data.address.town || data.address.village || "";
 
         setAddress(`${house} ${road}, ${city}`);
-        setDeliveryTime(10); // dynamic logic later
+        setDeliveryTime(10);
         setIsModalOpen(false);
       },
-      () => {
-        alert("Location permission denied");
-      }
+      () => alert("Location permission denied")
     );
   };
 
+  /* 🔍 CONFIRM SEARCH LOCATION */
   const handleConfirmLocation = () => {
     if (!input.trim()) return;
 
@@ -50,85 +95,85 @@ const LocationModal = () => {
 
   return (
     <>
-      {/* Background Overlay */}
+      {/* OVERLAY */}
       <div
         className="fixed inset-0 bg-black/40 z-40"
         onClick={() => setIsModalOpen(false)}
       />
 
-      {/* Modal */}
+      {/* MODAL */}
       <div
         className="
           fixed z-50 bg-[#f5f7fa]
-          w-full
-          bottom-0
-          rounded-t-2xl
-          p-4
+          w-full bottom-0 rounded-t-2xl p-4
           md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2
-          md:bottom-auto
-          md:w-[520px]
-          md:rounded-xl
+          md:bottom-auto md:w-[520px] md:rounded-xl
         "
       >
-        {/* Header */}
+        {/* HEADER */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Select your Location</h2>
+          <h2 className="text-lg font-semibold">Change Location</h2>
           <button onClick={() => setIsModalOpen(false)}>
             <X size={22} />
           </button>
         </div>
 
-        {/* Search */}
-        <div className="relative mb-4">
-          <Search
-            size={18}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
-          />
+        {/* DETECT + SEARCH */}
+        <div className="flex items-center gap-3 mb-4">
+          <button
+            onClick={handleDetectLocation}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium"
+          >
+            Detect my location
+          </button>
+
+          <span className="text-gray-400 text-sm">OR</span>
+
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Search delivery location"
-            className="w-full pl-10 pr-3 py-2 border rounded-lg outline-none"
+            placeholder="search delivery location"
+            className="flex-1 px-3 py-2 border rounded-lg outline-none"
           />
         </div>
 
-        {/* Detect location */}
-        <button
-          onClick={handleDetectLocation}
-          className="w-full flex items-center gap-2 text-green-600 font-medium bg-white py-3 rounded-lg mb-4"
-        >
-          <Crosshair size={18} />
-          Use current location
-        </button>
-
-        {/* Saved addresses */}
-        <div className="text-sm text-gray-500 mb-2">Your saved addresses</div>
-
-        <div className="max-h-[40vh] overflow-y-auto space-y-3">
-          {[
-            "89, Akbari Rd, Muzaffarnagar",
-            "12 Chimpiawara, West Nabab Ganj",
-            "Gh-7 Tower 9, Ghaziabad",
-          ].map((addr, i) => (
-            <div
-              key={i}
-              onClick={() => {
-                setAddress(addr);
-                setDeliveryTime(15);
-                setIsModalOpen(false);
-              }}
-              className="bg-white p-3 rounded-lg flex gap-3 cursor-pointer hover:bg-gray-100"
-            >
-              <MapPin size={18} className="text-gray-600 mt-1" />
-              <div>
-                <p className="font-medium">Home</p>
-                <p className="text-xs text-gray-500">{addr}</p>
-              </div>
+        {/* SAVED ADDRESSES */}
+        {hasSavedAddresses && (
+          <>
+            <div className="text-sm text-gray-500 mb-2">
+              Your saved addresses
             </div>
-          ))}
-        </div>
 
-        {/* Confirm button (mobile friendly) */}
+            <div className="space-y-3">
+              {savedAddresses.map((addr) => (
+                <AddressItem
+                  key={addr._id}
+                  address={addr}
+                  onSelect={() => {
+                    setAddress(
+                      `${addr.houseNo}, ${addr.street1}${
+                        addr.landmark ? ", " + addr.landmark : ""
+                      }`
+                    );
+
+                    setDeliveryTime(15);
+                    setIsModalOpen(false);
+                  }}
+                  onEdit={() => {
+                    setEditData(addr);
+                    setOpenEditModal(true);
+                  }}
+                  onDelete={async () => {
+                    await deleteAddress(addr._id);
+                    loadAddresses();
+                  }}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* CONFIRM */}
         <button
           onClick={handleConfirmLocation}
           className="w-full bg-black text-white py-3 rounded-lg mt-4"
@@ -136,7 +181,77 @@ const LocationModal = () => {
           Confirm location
         </button>
       </div>
+      {openEditModal && (
+        <AddressModal
+          initialData={editData}
+          onClose={() => {
+            setOpenEditModal(false);
+            setEditData(null);
+          }}
+          onSave={() => {
+            loadAddresses();
+            setOpenEditModal(false);
+            setEditData(null);
+          }}
+        />
+      )}
     </>
+  );
+};
+
+/* ✅ ADDRESS ITEM */
+const AddressItem = ({ address, onSelect, onEdit, onDelete }) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="bg-white rounded-xl p-4 flex justify-between items-start hover:bg-gray-50 transition">
+      {/* LEFT */}
+      <div className="flex gap-3 cursor-pointer items-start" onClick={onSelect}>
+        {/* ICON */}
+        <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+          {getTypeIcon(address.type)}
+        </div>
+
+        {/* TEXT */}
+        <div>
+          <p className="font-semibold capitalize">{address.type}</p>
+          <p className="text-sm text-gray-600">
+            {address.name}, {address.houseNo}, {address.street1}
+          </p>
+        </div>
+      </div>
+
+      {/* MENU */}
+      <div className="relative">
+        <button onClick={() => setOpen(!open)}>
+          <MoreVertical size={18} />
+        </button>
+
+        {open && (
+          <div className="absolute right-0 mt-2 w-28 bg-white border rounded-lg shadow-md z-50">
+            <button
+              onClick={() => {
+                setOpen(false);
+                onEdit();
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100"
+            >
+              <Pencil size={14} /> Edit
+            </button>
+
+            <button
+              onClick={() => {
+                setOpen(false);
+                onDelete();
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-gray-100"
+            >
+              <Trash2 size={14} /> Delete
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

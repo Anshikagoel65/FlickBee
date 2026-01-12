@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Search, MapPin, ChevronDown, User, ShoppingCart } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -21,6 +21,20 @@ const NavBar = () => {
   const { searchQuery, setSearchQuery } = useSearch();
   const { addRecentSearch } = useSearch();
   const { cart } = useCart();
+  const accountRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (accountRef.current && !accountRef.current.contains(event.target)) {
+        setAccountOpen(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
 
   const cartItems = Object.values(cart);
 
@@ -33,7 +47,8 @@ const NavBar = () => {
 
   const { address, deliveryTime, setIsModalOpen, isModalOpen } =
     useLocationContext();
-  const { isLoginOpen, setIsLoginOpen } = useAuthContext();
+  const { isLoginOpen, setIsLoginOpen, user, logout } = useAuthContext();
+  const [accountOpen, setAccountOpen] = useState(false);
 
   const showDeliveryTime = !!address;
 
@@ -137,13 +152,70 @@ const NavBar = () => {
 
             {/* Right */}
             <div className="flex items-center gap-10">
-              <button
-                onClick={() => setIsLoginOpen(true)}
-                className="text-gray-700 text-lg font-medium"
-              >
-                Login
-              </button>
+              {/* 🔐 LOGIN / ACCOUNT */}
+              {!user && (
+                <button
+                  onClick={() => setIsLoginOpen(true)}
+                  className="text-gray-700 text-xl font-medium"
+                >
+                  Login
+                </button>
+              )}
 
+              {/* ✅ ACCOUNT DROPDOWN */}
+              {user && (
+                <div ref={accountRef} className="relative">
+                  <button
+                    onClick={() => setAccountOpen((prev) => !prev)}
+                    className="flex items-center gap-2 text-gray-700 text-xl font-medium"
+                  >
+                    Account
+                    <ChevronDown size={18} />
+                  </button>
+                  {accountOpen && (
+                    <div className="absolute right-0 top-14 w-56 bg-white border rounded-xl shadow-lg z-50 overflow-hidden">
+                      <div className="px-4 py-3 border-b bg-gray-50">
+                        <p className="text-base font-bold text-gray-500">
+                          My Account
+                        </p>
+                        <p className="font-semibold text-sm text-gray-500">
+                          {user.phone}
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          navigate("/account/orders");
+                          setAccountOpen(false);
+                        }}
+                        className="block w-full text-left text-sm text-gray-600 px-4 py-3 hover:bg-gray-100"
+                      >
+                        My Orders
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          navigate("/account/addresses");
+                          setAccountOpen(false);
+                        }}
+                        className="block w-full text-left text-sm text-gray-600 px-4 py-3 hover:bg-gray-100"
+                      >
+                        Saved Addresses
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          logout();
+                          setAccountOpen(false);
+                        }}
+                        className="block w-full text-left px-4 py-3 text-sm text-gray-600 hover:bg-gray-100"
+                      >
+                        Log Out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
               <button
                 onClick={() => setIsCartOpen(true)}
                 className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
@@ -183,7 +255,13 @@ const NavBar = () => {
             </div>
 
             <button
-              onClick={() => setIsLoginOpen(true)}
+              onClick={() => {
+                if (!user) {
+                  setIsLoginOpen(true);
+                } else {
+                  navigate("/account/mobile");
+                }
+              }}
               className="text-gray-700"
             >
               <User />
