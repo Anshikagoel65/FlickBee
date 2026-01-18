@@ -7,11 +7,11 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = (product) => {
     setCart((prev) => {
-      const existing = prev[product.id];
+      const existing = prev[product._id];
 
       return {
         ...prev,
-        [product.id]: {
+        [product._id]: {
           ...product,
           cartQty: existing ? existing.cartQty + 1 : 1,
         },
@@ -21,18 +21,18 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = (product) => {
     setCart((prev) => {
-      const existing = prev[product.id];
+      const existing = prev[product._id];
       if (!existing) return prev;
 
       if (existing.cartQty === 1) {
         const updated = { ...prev };
-        delete updated[product.id];
+        delete updated[product._id];
         return updated;
       }
 
       return {
         ...prev,
-        [product.id]: {
+        [product._id]: {
           ...existing,
           cartQty: existing.cartQty - 1,
         },

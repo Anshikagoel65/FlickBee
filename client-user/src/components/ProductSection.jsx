@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import ProductCard from "./ProductCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const ProductSection = ({ title, products }) => {
+const ProductSection = ({ title, products, categoryId }) => {
   const sliderRef = useRef(null);
 
   const [showLeft, setShowLeft] = useState(false);
@@ -35,10 +35,15 @@ const ProductSection = ({ title, products }) => {
   }, [products]);
 
   // 🔴 SAFETY: don’t render empty sections
-  if (!products || products.length === 0) return null;
+
+  if (!Array.isArray(products) || products.length === 0) {
+    return null;
+  }
+
+  console.log("PRODUCTS PASSED:", products);
 
   return (
-    <section className="mt-10 relative">
+    <section id={categoryId} className="mt-10 relative">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-3xl font-bold">{title}</h2>
@@ -63,7 +68,7 @@ const ProductSection = ({ title, products }) => {
           className="flex gap-4 overflow-x-auto overflow-y-hidden scroll-smooth scrollbar-hide"
         >
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product._id} product={product} />
           ))}
         </div>
 

@@ -1,49 +1,64 @@
 import { useEffect, useState } from "react";
-import { Upload, Pencil } from "lucide-react";
+import { Upload } from "lucide-react";
 import { fetchCategories } from "../api/categoryApi";
-import { createProduct, getProducts, updateProduct } from "../api/productApi";
-import { deleteProduct } from "../api/productApi";
+import {
+  createProduct,
+  getProducts,
+  updateProduct,
+  deleteProduct,
+} from "../api/productApi";
 
 const Products = () => {
+  /* ================= STATES ================= */
   const [products, setProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [search, setSearch] = useState("");
 
   const [editingId, setEditingId] = useState(null);
 
+  // product fields
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [quantity, setQuantity] = useState("");
+  const [mrp, setMrp] = useState("");
+  const [productType, setProductType] = useState("");
   const [category, setCategory] = useState("");
-  const [image, setImage] = useState(null);
-  const [preview, setPreview] = useState(null);
-  const [allProducts, setAllProducts] = useState([]); // master list
-  const [search, setSearch] = useState(""); // search text
 
-  /* ================= LOAD DATA ON PAGE LOAD ================= */
+  // arrays
+  const [quantity, setQuantity] = useState([500]);
+  const [unit, setUnit] = useState(["gram"]);
 
-  const loadCategories = async () => {
-    try {
-      const res = await fetchCategories();
-      setCategories(res.data || []);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  // images
+  const [images, setImages] = useState([]);
+  const [preview, setPreview] = useState([]);
+
+  /* ================= LOAD DATA ================= */
 
   const loadProducts = async () => {
     try {
       const res = await getProducts();
-      setAllProducts(res.data || []);
       setProducts(res.data || []);
+      setAllProducts(res.data || []);
     } catch (err) {
-      console.error(err);
+      console.error("Product load failed", err);
     }
   };
 
   useEffect(() => {
     const init = async () => {
-      await loadCategories();
-      await loadProducts();
+      try {
+        const [catRes, prodRes] = await Promise.all([
+          fetchCategories(),
+          getProducts(),
+        ]);
+
+        setCategories(catRes.data || []);
+        setProducts(prodRes.data || []);
+        setAllProducts(prodRes.data || []);
+      } catch (err) {
+        console.error("Initial load failed", err);
+      }
     };
 
     init();
@@ -51,106 +66,122 @@ const Products = () => {
 
   /* ================= IMAGE HANDLER ================= */
   const handleImage = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    setImage(file);
-    setPreview(URL.createObjectURL(file));
+    const files = Array.from(e.target.files);
+    setImages(files);
+    setPreview(files.map((f) => URL.createObjectURL(f)));
   };
 
-  /* ================= EDIT PRODUCT ================= */
+  /* ================= EDIT ================= */
   const editProduct = (p) => {
+    console.log("EDIT PRODUCT:", p);
+
     setEditingId(p._id);
-    setName(p.name);
-    setPrice(p.price);
-    setQuantity(p.quantity);
-    setCategory(p.category);
-    setPreview(`http://localhost:5000${p.image}`);
-    setImage(null);
+    setName(p.name || "");
+    setDescription(p.description || "");
+    setPrice(p.price || "");
+    setMrp(p.mrp || "");
+    setProductType(p.productType || "");
+
+    // ✅ SAFE category handling
+    if (p.category && typeof p.category === "object") {
+      setCategory(p.category._id);
+    } else {
+      setCategory("");
+    }
+
+    setQuantity(Array.isArray(p.quantity) ? p.quantity : []);
+    setUnit(Array.isArray(p.unit) ? p.unit : []);
+
+    // ✅ SAFE image preview
+    if (Array.isArray(p.images) && p.images.length > 0) {
+      setPreview(p.images.map((img) => `http://localhost:5000${img}`));
+    } else {
+      setPreview([]);
+    }
+
+    setImages([]);
   };
 
-  /* ================= SAVE PRODUCT ================= */
+  /* ================= SAVE ================= */
   const saveProduct = async () => {
-    if (!name || !price || !quantity || !category) {
-      alert("Fill all fields");
+    if (
+      !name ||
+      !description ||
+      !price ||
+      !mrp ||
+      !productType ||
+      !category ||
+      (!editingId && images.length === 0)
+    ) {
+      alert("Fill all required fields");
       return;
     }
 
     const formData = new FormData();
     formData.append("name", name);
+    formData.append("description", description);
     formData.append("price", price);
-    formData.append("quantity", quantity);
+    formData.append("mrp", mrp);
+    formData.append("productType", productType);
     formData.append("category", category);
+    formData.append("quantity", JSON.stringify(quantity));
+    formData.append("unit", JSON.stringify(unit));
 
-    if (image) {
-      formData.append("image", image);
-    }
+    images.forEach((img) => formData.append("images", img));
 
     try {
       if (editingId) {
         await updateProduct(editingId, formData);
       } else {
-        if (!image) {
-          alert("Image is required");
-          return;
-        }
         await createProduct(formData);
       }
 
       resetForm();
-      loadProducts(); // ✅ REFRESH PRODUCTS AFTER SAVE
+      loadProducts();
     } catch (err) {
-      console.error("Failed to save product", err);
+      console.error("Save failed", err);
     }
   };
 
-  /* ================= RESET FORM ================= */
+  /* ================= RESET ================= */
   const resetForm = () => {
     setEditingId(null);
     setName("");
+    setDescription("");
     setPrice("");
-    setQuantity("");
+    setMrp("");
+    setProductType("");
     setCategory("");
-    setImage(null);
-    setPreview(null);
+    setQuantity([500]);
+    setUnit(["gram"]);
+    setImages([]);
+    setPreview([]);
   };
 
+  /* ================= DELETE ================= */
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this product?"
-    );
-
-    if (!confirmDelete) return;
-
-    try {
-      await deleteProduct(id);
-      loadProducts(); // 🔥 refresh list after delete
-    } catch (err) {
-      console.error("Delete failed", err);
-    }
+    if (!window.confirm("Delete this product?")) return;
+    await deleteProduct(id);
+    loadProducts();
   };
 
+  /* ================= SEARCH ================= */
   const handleSearch = (value) => {
     setSearch(value);
+    if (!value.trim()) return setProducts(allProducts);
 
-    if (value.trim() === "") {
-      // 🔥 if search cleared, show all products again
-      setProducts(allProducts);
-      return;
-    }
-
-    const filteredProducts = allProducts.filter((product) =>
-      product.name.toLowerCase().includes(value.toLowerCase())
+    setProducts(
+      allProducts.filter((p) =>
+        p.name.toLowerCase().includes(value.toLowerCase())
+      )
     );
-
-    setProducts(filteredProducts);
   };
 
+  /* ================= UI ================= */
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-6">Products</h1>
-
-      {/* ================= FORM ================= */}
+      {/* FORM */}
       <div className="bg-white p-6 rounded-xl shadow mb-10 max-w-xl">
         <h2 className="font-semibold mb-4">
           {editingId ? "Edit Product" : "Add Product"}
@@ -163,6 +194,13 @@ const Products = () => {
           className="border w-full mb-3 px-3 py-2 rounded"
         />
 
+        <textarea
+          placeholder="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="border w-full mb-3 px-3 py-2 rounded"
+        />
+
         <input
           placeholder="Price"
           value={price}
@@ -171,9 +209,46 @@ const Products = () => {
         />
 
         <input
-          placeholder="Quantity (e.g. 500 ml)"
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
+          placeholder="MRP"
+          value={mrp}
+          onChange={(e) => setMrp(e.target.value)}
+          className="border w-full mb-3 px-3 py-2 rounded"
+        />
+
+        <select
+          value={productType}
+          onChange={(e) => setProductType(e.target.value)}
+          className="border px-3 py-2 w-full mb-3 rounded"
+        >
+          <option value="">Select Product Type</option>
+          <option value="grocery">Grocery</option>
+          <option value="snacks">Snacks</option>
+          <option value="beverages">Beverages</option>
+          <option value="dairy">Dairy</option>
+          <option value="fruits">Fruits</option>
+          <option value="vegetables">Vegetables</option>
+        </select>
+
+        <input
+          placeholder="Quantities (e.g. 500,1000)"
+          value={quantity.join(",")}
+          onChange={(e) =>
+            setQuantity(
+              e.target.value
+                .split(",")
+                .map((q) => Number(q.trim()))
+                .filter(Boolean)
+            )
+          }
+          className="border w-full mb-3 px-3 py-2 rounded"
+        />
+
+        <input
+          placeholder="Units (e.g. gram,kg)"
+          value={unit.join(",")}
+          onChange={(e) =>
+            setUnit(e.target.value.split(",").map((u) => u.trim()))
+          }
           className="border w-full mb-3 px-3 py-2 rounded"
         />
 
@@ -192,34 +267,27 @@ const Products = () => {
 
         <label className="border-2 border-dashed rounded-lg p-4 flex flex-col items-center cursor-pointer text-gray-500 mb-4">
           <Upload />
-          <span className="text-sm mt-2">
-            {editingId ? "Change image (optional)" : "Upload product image"}
-          </span>
-          <input type="file" accept="image/*" hidden onChange={handleImage} />
+          <span className="text-sm mt-2">Upload images</span>
+          <input type="file" multiple hidden onChange={handleImage} />
         </label>
 
-        {preview && (
-          <img
-            src={preview}
-            alt="Preview"
-            className="h-28 w-28 object-cover rounded mb-4"
-          />
-        )}
-
-        <div className="flex gap-3">
-          <button
-            onClick={saveProduct}
-            className="bg-green-600 text-white px-4 py-2 rounded"
-          >
-            {editingId ? "Update Product" : "Save Product"}
-          </button>
-
-          {editingId && (
-            <button onClick={resetForm} className="border px-4 py-2 rounded">
-              Cancel
-            </button>
-          )}
+        <div className="flex gap-2 flex-wrap mb-4">
+          {preview.map((src, i) => (
+            <img
+              key={i}
+              src={src}
+              className="h-20 w-20 object-cover rounded"
+              alt="preview"
+            />
+          ))}
         </div>
+
+        <button
+          onClick={saveProduct}
+          className="bg-green-600 text-white px-4 py-2 rounded"
+        >
+          {editingId ? "Update Product" : "Save Product"}
+        </button>
       </div>
       <input
         type="text"
@@ -229,12 +297,20 @@ const Products = () => {
         className="border px-4 py-2 mb-6 w-full rounded"
       />
 
-      {/* ================= PRODUCT LIST ================= */}
+      {/* LIST */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {products.map((p) => (
           <div key={p._id} className="bg-white p-3 rounded-xl shadow">
             <img
-              src={`http://localhost:5000${p.image}`}
+              src={
+                p.thumbnail
+                  ? `http://localhost:5000${p.thumbnail}`
+                  : p.images?.length
+                  ? `http://localhost:5000${p.images[0]}`
+                  : p.image
+                  ? `http://localhost:5000${p.image}`
+                  : "/placeholder.png"
+              }
               alt={p.name}
               className="h-40 w-full object-cover rounded"
             />
@@ -242,21 +318,17 @@ const Products = () => {
             <div className="mt-2">
               <p className="font-semibold">{p.name}</p>
               <p className="text-sm text-gray-500">
-                ₹{p.price} · {p.quantity}
+                ₹{p.price} · {p.quantity?.join(", ")} {p.unit?.join(", ")}
               </p>
             </div>
 
             <div className="flex gap-3 mt-2">
-              <button
-                onClick={() => editProduct(p)}
-                className="flex items-center gap-1 text-green-600 text-sm"
-              >
+              <button onClick={() => editProduct(p)} className="text-green-600">
                 Edit
               </button>
-
               <button
                 onClick={() => handleDelete(p._id)}
-                className="text-red-600 text-sm"
+                className="text-red-600"
               >
                 Delete
               </button>

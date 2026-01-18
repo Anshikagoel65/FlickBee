@@ -27,7 +27,7 @@ const Categories = () => {
   const [imageFile, setImageFile] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  /* ✅ LOAD CATEGORIES (NO ESLINT WARNING) */
+  /* ✅ LOAD CATEGORIES */
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -50,7 +50,7 @@ const Categories = () => {
     setPreview(URL.createObjectURL(file));
   };
 
-  /* 🔹 save category (add / update) */
+  /* 🔹 save category */
   const saveCategory = async () => {
     if (!name || !slug) return;
 
@@ -67,11 +67,10 @@ const Categories = () => {
       if (editingId) {
         await updateCategory(editingId, formData);
       } else {
-        if (!imageFile) return; // image required for new category
+        if (!imageFile) return;
         await createCategory(formData);
       }
 
-      // reload categories
       const res = await fetchCategories();
       setCategories(res.data || []);
       resetForm();
@@ -80,7 +79,7 @@ const Categories = () => {
     }
   };
 
-  /* 🔹 edit category */
+  /* 🔹 edit */
   const editCategory = (cat) => {
     setName(cat.name);
     setSlug(cat.slug);
@@ -91,7 +90,7 @@ const Categories = () => {
     setShowForm(true);
   };
 
-  /* 🔹 delete category */
+  /* 🔹 delete */
   const deleteCategory = async (id) => {
     if (!window.confirm("Delete this category?")) return;
 
@@ -104,7 +103,7 @@ const Categories = () => {
     }
   };
 
-  /* 🔹 reset form */
+  /* 🔹 reset */
   const resetForm = () => {
     setName("");
     setSlug("");
@@ -133,7 +132,6 @@ const Categories = () => {
       {showForm && (
         <div className="bg-white p-4 rounded-xl shadow mb-6">
           <div className="grid gap-4 sm:grid-cols-2">
-            {/* NAME */}
             <input
               type="text"
               placeholder="Category name"
@@ -145,7 +143,6 @@ const Categories = () => {
               className="border rounded-lg px-3 py-2"
             />
 
-            {/* SLUG */}
             <input
               type="text"
               placeholder="Slug"
@@ -154,7 +151,6 @@ const Categories = () => {
               className="border rounded-lg px-3 py-2"
             />
 
-            {/* ORDER */}
             <input
               type="number"
               placeholder="Display order"
@@ -163,7 +159,6 @@ const Categories = () => {
               className="border rounded-lg px-3 py-2"
             />
 
-            {/* IMAGE */}
             <label className="border-2 border-dashed rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer text-gray-500 hover:border-green-500">
               <Upload />
               <span className="text-sm mt-2">Upload category image</span>
@@ -176,10 +171,8 @@ const Categories = () => {
             </label>
           </div>
 
-          {/* PREVIEW */}
           {preview && (
             <div className="mt-4">
-              <p className="text-sm font-medium mb-2">Preview</p>
               <img
                 src={preview}
                 alt="Preview"
@@ -188,7 +181,6 @@ const Categories = () => {
             </div>
           )}
 
-          {/* ACTIONS */}
           <div className="flex gap-3 mt-4">
             <button
               onClick={saveCategory}
@@ -204,51 +196,55 @@ const Categories = () => {
         </div>
       )}
 
-      {/* CATEGORY GRID */}
+      {/* GRID */}
       {categories.length === 0 ? (
         <p className="text-gray-500">No categories added yet.</p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {categories.map((cat) => (
-            <div key={cat._id} className="bg-white rounded-xl shadow p-3">
-              {cat.image && (
-                <img
-                  src={`http://localhost:5000${cat.image}`}
-                  alt={cat.name}
-                  className="h-32 w-full object-cover rounded-lg"
-                />
-              )}
+          {categories.map((cat) => {
+            console.log("IMAGE PATH:", cat.image);
 
-              <div className="mt-3">
-                <p className="font-semibold">{cat.name}</p>
-                <p className="text-xs text-gray-500">{cat.slug}</p>
+            return (
+              <div key={cat._id} className="bg-white rounded-xl shadow p-3">
+                {cat.image && (
+                  <img
+                    src={`http://localhost:5000${cat.image}`}
+                    alt={cat.name}
+                    className="h-32 w-full object-cover rounded-lg"
+                  />
+                )}
 
-                <p
-                  className={`text-sm ${
-                    cat.isActive ? "text-green-600" : "text-red-600"
-                  }`}
-                >
-                  {cat.isActive ? "Active" : "Inactive"}
-                </p>
+                <div className="mt-3">
+                  <p className="font-semibold">{cat.name}</p>
+                  <p className="text-xs text-gray-500">{cat.slug}</p>
 
-                <div className="flex gap-2 mt-3">
-                  <button
-                    onClick={() => editCategory(cat)}
-                    className="flex-1 border rounded-lg py-1 text-sm hover:bg-gray-100"
+                  <p
+                    className={`text-sm ${
+                      cat.isActive ? "text-green-600" : "text-red-600"
+                    }`}
                   >
-                    Edit
-                  </button>
+                    {cat.isActive ? "Active" : "Inactive"}
+                  </p>
 
-                  <button
-                    onClick={() => deleteCategory(cat._id)}
-                    className="flex-1 border rounded-lg py-1 text-sm text-red-600 hover:bg-red-50"
-                  >
-                    Delete
-                  </button>
+                  <div className="flex gap-2 mt-3">
+                    <button
+                      onClick={() => editCategory(cat)}
+                      className="flex-1 border rounded-lg py-1 text-sm hover:bg-gray-100"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      onClick={() => deleteCategory(cat._id)}
+                      className="flex-1 border rounded-lg py-1 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

@@ -1,4 +1,5 @@
 import axios from "axios";
 
-export const fetchUserCategories = () =>
-  axios.get("http://localhost:5000/api/categories");
+export const fetchUserCategories = axios.create({
+  baseURL: "http://localhost:5000/api/categories",
+});

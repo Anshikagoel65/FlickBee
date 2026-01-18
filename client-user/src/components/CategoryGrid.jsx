@@ -1,21 +1,37 @@
 import { useEffect, useState } from "react";
 import { fetchUserCategories } from "../services/categoryApi";
 
-const CategoryGrid = () => {
+const API_BASE = "http://localhost:5000";
+
+const CategoryGrid = ({ onCategorySelect }) => {
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // ✅ define function BEFORE useEffect
+  const loadCategories = async () => {
+    try {
+      const res = await fetchUserCategories();
+      setCategories(res.data || []);
+    } catch (err) {
+      console.error("Failed to load categories", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     loadCategories();
   }, []);
 
-  const loadCategories = async () => {
-    try {
-      const res = await fetchUserCategories();
-      setCategories(res.data);
-    } catch (err) {
-      console.error("Failed to load categories", err);
-    }
-  };
+  /* 🔄 LOADING STATE */
+  if (loading) {
+    return <p className="mt-6 text-gray-500">Loading categories…</p>;
+  }
+
+  /* 🚫 EMPTY STATE */
+  if (categories.length === 0) {
+    return <p className="mt-6 text-gray-500">No categories available</p>;
+  }
 
   return (
     <section className="mt-6">
@@ -32,9 +48,10 @@ const CategoryGrid = () => {
         {categories.map((cat) => (
           <div
             key={cat._id}
+            onClick={() => onCategorySelect(cat.slug)}
             className="flex flex-col items-center cursor-pointer"
           >
-            {/* FULL IMAGE TILE */}
+            {/* IMAGE TILE */}
             <div
               className="
                 w-20 h-20
@@ -46,14 +63,23 @@ const CategoryGrid = () => {
                 transition
               "
             >
-              <img
-                src={`http://localhost:5000${cat.image}`}
-                alt={cat.name}
-                className="w-full h-full object-cover"
-              />
+              {cat.image ? (
+                <img
+                  src={`${API_BASE}${cat.image}`}
+                  alt={cat.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = "/placeholder.png";
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
+                  No Image
+                </div>
+              )}
             </div>
 
-            {/* Label */}
+            {/* LABEL */}
             <p className="mt-2 text-sm sm:text-base text-center font-medium text-gray-800 leading-tight">
               {cat.name}
             </p>
