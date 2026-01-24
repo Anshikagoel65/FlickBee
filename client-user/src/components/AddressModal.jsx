@@ -77,8 +77,11 @@ const AddressModal = ({ onClose, onSave, initialData }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-2">
-      <div className="bg-white w-full max-w-md rounded-xl shadow-lg max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-black/40 z-[300] flex items-center justify-center px-2">
+      <div
+        className="bg-white w-full sm:max-w-md h-full sm:h-auto rounded-none sm:rounded-xl shadow-lg max-h-[90vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* HEADER */}
         <div className="flex justify-between items-center px-5 py-4 border-b sticky top-0 bg-white z-10">
           <h2 className="font-semibold text-lg">

@@ -35,7 +35,7 @@ const storeProductInfoSchema = new mongoose.Schema(
       type: Number,
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const productSchema = new mongoose.Schema(
@@ -173,7 +173,7 @@ const productSchema = new mongoose.Schema(
       default: {},
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Product", productSchema);

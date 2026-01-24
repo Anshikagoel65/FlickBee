@@ -1,5 +1,7 @@
 import { useCart } from "../context/CartContext";
 
+const API_BASE = "http://localhost:5000";
+
 const CartItemRow = ({ item }) => {
   const { addToCart, removeFromCart } = useCart();
 
@@ -7,8 +9,12 @@ const CartItemRow = ({ item }) => {
     <div className="flex items-center justify-between">
       {/* Left */}
       <div className="flex items-center gap-3">
-        <div className="w-14 h-14 bg-gray-200 rounded-lg flex items-center justify-center text-xs text-gray-400">
-          Image
+        <div className="w-14 h-14 rounded-lg overflow-hidden">
+          <img
+            src={`${API_BASE}${item.thumbnail}`}
+            alt={item.name}
+            className="w-full h-full object-cover"
+          />
         </div>
 
         <div>

@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import LocationModal from "./LocationModal";
 import LoginModal from "./LoginModal";
 import CartDrawer from "./CartDrawer";
+import AddressDrawer from "./AddressDrawer";
 
 import { useLocationContext } from "../context/LocationContext";
 import { useAuthContext } from "../context/AuthContext";
@@ -42,7 +43,7 @@ const NavBar = () => {
 
   const cartTotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.cartQty,
-    0
+    0,
   );
 
   const { address, deliveryTime, setIsModalOpen, isModalOpen } =
@@ -290,10 +291,50 @@ const NavBar = () => {
         </div>
       </nav>
 
+      {/* ================= MOBILE CART BAR ================= */}
+      {cartCount > 0 && !isCartOpen && (
+        <div
+          className="
+      fixed
+      bottom-4
+      left-4
+      right-4
+      z-[100]
+      bg-green-700
+      text-white
+      px-4
+      py-3
+      flex
+      items-center
+      justify-between
+      rounded-xl
+      shadow-lg
+      md:hidden
+    "
+          onClick={() => setIsCartOpen(true)}
+        >
+          <div className="flex items-center gap-3">
+            <ShoppingCart size={28} />
+
+            <div className="leading-tight">
+              <p className="text-sm font-sm">
+                {cartCount} item{cartCount > 1 ? "s" : ""}
+              </p>
+              <p className="text-md font-bold">₹{cartTotal}</p>
+            </div>
+          </div>
+
+          <button className="bg-white text-green-700 px-4 py-2 rounded-lg font-bold">
+            View Cart →
+          </button>
+        </div>
+      )}
+
       {/* Modals */}
       {isModalOpen && <LocationModal />}
       {isLoginOpen && <LoginModal />}
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      <AddressDrawer />
     </>
   );
 };

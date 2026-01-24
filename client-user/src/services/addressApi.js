@@ -1,10 +1,10 @@
-import API from "./api";
+import apiClient from "./apiClient";
 
 // ✅ MUST MATCH BACKEND ROUTES
-export const getAddresses = () => API.get("/address");
+export const getAddresses = () => apiClient.get("/address");
 
 export const addAddress = (data) =>
-  API.post("/address", {
+  apiClient.post("/address", {
     name: data.name,
     phone: data.phone,
 
@@ -24,7 +24,7 @@ export const addAddress = (data) =>
   });
 
 export const updateAddress = (id, data) =>
-  API.put(`/address/${id}`, {
+  apiClient.put(`/address/${id}`, {
     name: data.name,
     phone: data.phone,
 
@@ -43,4 +43,4 @@ export const updateAddress = (id, data) =>
     isDefault: data.isDefault,
   });
 
-export const deleteAddress = (id) => API.delete(`/address/${id}`);
+export const deleteAddress = (id) => apiClient.delete(`/address/${id}`);

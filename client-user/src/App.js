@@ -8,8 +8,17 @@ import Account from "./pages/account/Account";
 import MyOrders from "./pages/account/MyOrders";
 import MyAddresses from "./pages/account/MyAddresses";
 import AccountMobile from "./pages/account/AccountMobile";
+import CategoryPage from "./pages/CategoryPage";
+import ProductPage from "./components/ProductPage";
+import { useAuthContext } from "./context/AuthContext";
+import OrderInvoice from "./pages/account/OrderInvoice";
 
 function App() {
+  const { authLoading } = useAuthContext();
+
+  if (authLoading) {
+    return <div>Loading...</div>;
+  }
   return (
     <BrowserRouter>
       {/* 🔔 TOASTER (GLOBAL) */}
@@ -18,13 +27,16 @@ function App() {
       <NavBar />
 
       {/* OFFSET FOR FIXED NAVBAR */}
-      <div className="pt-[70px] md:pt-[80px]">
+      <div className="pt-[90px] md:pt-[80px]">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/category/:slug" element={<CategoryPage />} />
+          <Route path="/product/:id" element={<ProductPage />} />
           <Route path="/search" element={<Search />} />
           <Route path="/account" element={<Account />}>
             <Route path="orders" element={<MyOrders />} />
             <Route path="addresses" element={<MyAddresses />} />
+            <Route path="orders/:orderId" element={<OrderInvoice />} />
           </Route>
 
           {/* MOBILE ACCOUNT */}

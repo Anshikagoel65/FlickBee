@@ -9,6 +9,7 @@ const adminRoutes = require("./routes/admin.routes");
 const userRoutes = require("./routes/user.routes");
 const authRoutes = require("./routes/auth");
 const addressRoutes = require("./routes/address.routes");
+const orderRoutes = require("./routes/order.routes");
 
 const app = express();
 
@@ -22,7 +23,7 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
-  })
+  }),
 );
 
 app.use(express.json());
@@ -31,6 +32,7 @@ app.use("/api/admin", adminRoutes); // 🔴 ADMIN
 app.use("/api", userRoutes); // 🔵 USER
 app.use("/api/auth", authRoutes);
 app.use("/api/address", addressRoutes);
+app.use("/api/orders", orderRoutes);
 
 /* DB */
 connectDB();

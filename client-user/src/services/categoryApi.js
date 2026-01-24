@@ -1,5 +1,5 @@
-import axios from "axios";
+import apiClient from "./apiClient";
 
-export const fetchUserCategories = axios.create({
+export const fetchUserCategories = apiClient.create({
   baseURL: "http://localhost:5000/api/categories",
 });

@@ -30,7 +30,7 @@ const Home = () => {
   }, [activeCategory]);
 
   return (
-    <main className="w-full">
+    <main className="w-full pb-20 md:pb-0">
       <div className="max-w-[1400px] mx-auto px-6 py-6">
         <HeroBanners />
 
@@ -46,10 +46,12 @@ const Home = () => {
           })
           .map((sec) => (
             <ProductSection
-              key={sec._id}
+              key={sec._id || sec.category.slug}
               title={sec.category.name}
               products={sec.products}
-              categoryId={sec.category.slug}
+              categorySlug={sec.category.slug}
+              layout="carousel"
+              showSeeAll={true}
             />
           ))}
       </div>

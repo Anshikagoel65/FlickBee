@@ -1,8 +1,11 @@
-import axios from "axios";
-
-const API = "http://localhost:5000/api";
+import apiClient from "./apiClient";
 
 export const getProducts = async () => {
-  const res = await axios.get(`${API}/products`);
+  const res = await apiClient.get("/products");
+  return res.data;
+};
+
+export const getProductById = async (id) => {
+  const res = await apiClient.get(`/products/${id}`);
   return res.data;
 };

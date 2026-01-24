@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { fetchUserCategories } from "../services/categoryApi";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE = "http://localhost:5000";
 
 const CategoryGrid = ({ onCategorySelect }) => {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -48,7 +50,7 @@ const CategoryGrid = ({ onCategorySelect }) => {
         {categories.map((cat) => (
           <div
             key={cat._id}
-            onClick={() => onCategorySelect(cat.slug)}
+            onClick={() => navigate(`/category/${cat.slug}`)}
             className="flex flex-col items-center cursor-pointer"
           >
             {/* IMAGE TILE */}

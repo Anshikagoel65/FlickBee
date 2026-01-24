@@ -19,7 +19,7 @@ const SearchResults = () => {
   }, []);
 
   const filtered = products.filter((p) =>
-    p.name.toLowerCase().includes(searchQuery.toLowerCase())
+    p.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   if (!searchQuery) return null;
@@ -27,7 +27,7 @@ const SearchResults = () => {
   return (
     <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
       {filtered.map((product) => (
-        <ProductCard key={product.id} product={product} />
+        <ProductCard key={product.id} product={product} variant="grid" />
       ))}
     </div>
   );

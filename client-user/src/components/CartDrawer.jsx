@@ -1,11 +1,16 @@
 import { X } from "lucide-react";
+import { useAuthContext } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import CartItemRow from "./CartItemRow";
 import BillDetails from "./BillDetails";
 import { useLocationContext } from "../context/LocationContext";
+import { useDrawer } from "../context/AddressDrawerContext";
 
 const CartDrawer = ({ isOpen, onClose }) => {
   const { deliveryTime } = useLocationContext();
+  const { user, setIsLoginOpen, setPostLoginAction, isAuthenticated } =
+    useAuthContext();
+  const { setDrawerView } = useDrawer();
 
   const { cart } = useCart();
   if (!isOpen) return null;
@@ -14,7 +19,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
   const itemsTotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.cartQty,
-    0
+    0,
   );
 
   const DELIVERY_THRESHOLD = 100;
@@ -26,6 +31,20 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
   const grandTotal = itemsTotal + deliveryCharge + handlingCharge;
 
+  const handleProceed = () => {
+    onClose();
+
+    if (isAuthenticated || user) {
+      setDrawerView("address-list");
+      return;
+    }
+
+    setPostLoginAction(() => () => {
+      setDrawerView("address-list");
+    });
+
+    setIsLoginOpen(true);
+  };
   return (
     <div className="fixed inset-0 z-50">
       {/* Overlay */}
@@ -95,7 +114,10 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
         {/* BOTTOM BAR (fixed) */}
         <div className="p-4 bg-white border-t shrink-0">
-          <button className="w-full bg-green-700 text-white rounded-xl py-4 flex justify-between items-center px-4">
+          <button
+            onClick={handleProceed}
+            className="w-full bg-green-700 text-white rounded-xl py-4 flex justify-between items-center px-4"
+          >
             <div>
               <p className="text-lg font-bold">₹{grandTotal}</p>
               <p className="text-xs text-gray-200">TOTAL</p>

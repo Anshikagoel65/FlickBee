@@ -4,7 +4,8 @@ import { sendOtp, verifyOtp } from "../services/authApi";
 import toast from "react-hot-toast";
 
 const LoginModal = () => {
-  const { login, setIsLoginOpen, user } = useAuthContext();
+  const { login, setIsLoginOpen, user, postLoginAction, setPostLoginAction } =
+    useAuthContext();
 
   const [step, setStep] = useState("phone");
   const [phone, setPhone] = useState("");
@@ -42,10 +43,6 @@ const LoginModal = () => {
 
     try {
       const res = await verifyOtp(`+91${phone}`, otp);
-
-      // ✅ IMPORTANT
-      console.log("VERIFY OTP RESPONSE 👉", res.data);
-
       const { token, phone: userPhone } = res.data;
 
       if (!token) {
@@ -59,6 +56,10 @@ const LoginModal = () => {
 
       setTimeout(() => {
         setIsLoginOpen(false);
+        if (postLoginAction) {
+          postLoginAction();
+          setPostLoginAction(null);
+        }
       }, 1000);
     } catch (err) {
       toast.error("Invalid OTP", { id: toastId });
