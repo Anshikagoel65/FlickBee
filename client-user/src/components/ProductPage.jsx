@@ -3,12 +3,11 @@ import { useEffect, useState } from "react";
 import { getProductById } from "../services/productApi";
 import { useCart } from "../context/CartContext";
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 const ProductPage = () => {
   const { id } = useParams();
   const { cart, addToCart, removeFromCart } = useCart();
-
   const [product, setProduct] = useState(null);
   const [activeImage, setActiveImage] = useState("");
 
@@ -32,7 +31,6 @@ const ProductPage = () => {
   return (
     <div className="max-w-[1200px] mx-auto px-4 pt-[80px] pb-10">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* ================= LEFT : IMAGES ================= */}
         <div>
           <div className="w-full h-[300px] sm:h-[420px] bg-white border rounded-xl flex items-center justify-center">
             <img
@@ -41,8 +39,6 @@ const ProductPage = () => {
               className="max-h-full object-contain"
             />
           </div>
-
-          {/* THUMBNAILS */}
           <div className="flex gap-3 mt-4 overflow-x-auto">
             {[product.thumbnail, ...(product.images || [])].map((img, i) => (
               <div
@@ -61,27 +57,20 @@ const ProductPage = () => {
             ))}
           </div>
         </div>
-
-        {/* ================= RIGHT : DETAILS ================= */}
         <div>
-          {/* BREADCRUMB */}
           <p className="text-sm text-gray-500 mb-2">
             Home / {product.category?.name}
           </p>
 
-          {/* TITLE */}
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">
             {product.name}
           </h1>
 
-          {/* WEIGHT */}
           <p className="text-gray-600 mb-4">
             {product.quantity?.[0]} {product.unit?.[0]}
           </p>
 
-          {/* PRICE + ADD */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            {/* PRICE */}
             <div>
               <div className="flex items-center gap-3">
                 <span className="text-2xl font-bold">₹{product.price}</span>
@@ -95,8 +84,6 @@ const ProductPage = () => {
                 (Inclusive of all taxes)
               </p>
             </div>
-
-            {/* ADD / QUANTITY */}
             {quantity === 0 ? (
               <button
                 onClick={() => addToCart(product)}
@@ -134,8 +121,6 @@ const ProductPage = () => {
               </div>
             )}
           </div>
-
-          {/* WHY SHOP */}
           <div className="mt-8 space-y-5">
             <h3 className="text-lg font-semibold">Why shop from us?</h3>
 

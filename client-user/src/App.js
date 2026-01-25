@@ -19,33 +19,31 @@ function App() {
   if (authLoading) {
     return <div>Loading...</div>;
   }
+
   return (
-    <BrowserRouter>
-      {/* 🔔 TOASTER (GLOBAL) */}
-      <Toaster position="top-center" reverseOrder={false} />
-
-      <NavBar />
-
-      {/* OFFSET FOR FIXED NAVBAR */}
-      <div className="pt-[90px] md:pt-[80px]">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/category/:slug" element={<CategoryPage />} />
-          <Route path="/product/:id" element={<ProductPage />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/account" element={<Account />}>
-            <Route path="orders" element={<MyOrders />} />
-            <Route path="addresses" element={<MyAddresses />} />
-            <Route path="orders/:orderId" element={<OrderInvoice />} />
-          </Route>
-
-          {/* MOBILE ACCOUNT */}
-          <Route path="/account/mobile" element={<AccountMobile />}>
-            <Route path="addresses" element={<MyAddresses />} />
-          </Route>
-        </Routes>
-      </div>
-    </BrowserRouter>
+    <>
+      <div id="recaptcha-container"></div>
+      <BrowserRouter>
+        <Toaster position="top-center" reverseOrder={false} />
+        <NavBar />
+        <div className="pt-[90px] md:pt-[80px]">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/category/:slug" element={<CategoryPage />} />
+            <Route path="/product/:id" element={<ProductPage />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/account" element={<Account />}>
+              <Route path="orders" element={<MyOrders />} />
+              <Route path="addresses" element={<MyAddresses />} />
+              <Route path="orders/:orderId" element={<OrderInvoice />} />
+            </Route>
+            <Route path="/account/mobile" element={<AccountMobile />}>
+              <Route path="addresses" element={<MyAddresses />} />
+            </Route>
+          </Routes>
+        </div>
+      </BrowserRouter>
+    </>
   );
 }
 

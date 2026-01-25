@@ -67,17 +67,12 @@ const AddressDrawer = () => {
       name: item.name,
       price: item.price,
       mrp: item.mrp,
-
-      // 🔥 FIX HERE
       quantity: Array.isArray(item.quantity)
         ? Number(item.quantity[0])
         : Number(item.quantity),
-
       unit: Array.isArray(item.unit) ? item.unit[0] : item.unit,
-
       count: item.cartQty,
       image: item.image || item.thumbnail || item.images?.[0] || null,
-
       isSubstituted: false,
     }));
 
@@ -102,20 +97,14 @@ const AddressDrawer = () => {
   return (
     <>
       <div className="fixed inset-0 z-[100]">
-        {/* OVERLAY */}
         <div className="absolute inset-0 bg-black/40" />
-
-        {/* DRAWER */}
         <div className="absolute right-0 top-0 h-full w-full sm:w-[420px] bg-[#f5f7fa] flex flex-col">
-          {/* HEADER */}
           <div className="bg-white px-4 py-4 flex items-center gap-3 border-b">
             <button onClick={() => setDrawerView(null)}>
               <ArrowLeft />
             </button>
             <h2 className="text-lg font-bold">Select delivery address</h2>
           </div>
-
-          {/* BODY */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {/* ADD NEW ADDRESS */}
             <button
@@ -180,8 +169,6 @@ const AddressDrawer = () => {
               </div>
             ))}
           </div>
-
-          {/* BOTTOM PAYMENT BAR */}
           {selectedAddressId && (
             <div className="bg-white border-t p-4 shrink-0">
               <button
@@ -199,7 +186,6 @@ const AddressDrawer = () => {
         </div>
       </div>
 
-      {/* ADDRESS MODAL */}
       {showAddressModal && (
         <AddressModal
           initialData={editAddress}

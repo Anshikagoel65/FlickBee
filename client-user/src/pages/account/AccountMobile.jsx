@@ -1,6 +1,5 @@
 import { ArrowLeft, ClipboardList, MapPin, LogOut } from "lucide-react";
 import { Outlet, useNavigate } from "react-router-dom";
-
 import { useAuthContext } from "../../context/AuthContext";
 
 const AccountMobile = () => {
@@ -9,7 +8,6 @@ const AccountMobile = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* HEADER */}
       <div className="flex items-center gap-3 px-4 pt-10 pb-4 border-b">
         <button onClick={() => navigate(-1)}>
           <ArrowLeft />
@@ -19,11 +17,7 @@ const AccountMobile = () => {
           <p className="text-sm text-gray-500">{user?.phone}</p>
         </div>
       </div>
-
-      {/* SECTION */}
       <p className="px-4 pt-6 pb-2 text-sm text-gray-400">Your Information</p>
-
-      {/* MENU */}
       <div className="space-y-1 px-2">
         <Item
           icon={<ClipboardList />}

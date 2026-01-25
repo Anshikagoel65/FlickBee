@@ -6,7 +6,7 @@ import { getSections } from "../services/sectionApi";
 
 const Home = () => {
   const [sections, setSections] = useState([]);
-  const [activeCategory, setActiveCategory] = useState(null); // ✅ MOVED INSIDE
+  const [activeCategory, setActiveCategory] = useState(null);
 
   useEffect(() => {
     loadSections();
@@ -21,7 +21,6 @@ const Home = () => {
     }
   };
 
-  // ✅ Optional: auto-scroll like Blinkit
   useEffect(() => {
     if (activeCategory) {
       const el = document.getElementById(activeCategory);
@@ -33,15 +32,11 @@ const Home = () => {
     <main className="w-full pb-20 md:pb-0">
       <div className="max-w-[1400px] mx-auto px-6 py-6">
         <HeroBanners />
-
-        {/* CATEGORY CLICK */}
         <CategoryGrid onCategorySelect={setActiveCategory} />
-
-        {/* PRODUCTS */}
         {sections
           .filter((sec) => {
             if (!sec?.category || !sec?.products?.length) return false;
-            if (!activeCategory) return true; // show all
+            if (!activeCategory) return true;
             return sec.category.slug === activeCategory;
           })
           .map((sec) => (

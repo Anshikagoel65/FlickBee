@@ -10,7 +10,6 @@ const Account = () => {
   return (
     <div className="max-w-[1200px] mx-auto pt-10 px-3 md:px-0">
       <div className="flex gap-6">
-        {/* DESKTOP SIDEBAR */}
         <aside className="hidden md:block w-[260px] h-[550px] bg-white rounded-xl border shadow-sm">
           <div className="px-5 py-6 border-b text-center font-medium">
             {user?.phone}
@@ -41,8 +40,6 @@ const Account = () => {
             <LogOut size={20} /> Logout
           </button>
         </aside>
-
-        {/* RIGHT CONTENT */}
         <main className="flex-1 w-full">
           <Outlet />
         </main>

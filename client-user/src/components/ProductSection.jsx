@@ -42,8 +42,6 @@ const ProductSection = ({
     updateArrows();
   }, [products]);
 
-  // 🔴 SAFETY: don’t render empty sections
-
   if (!Array.isArray(products) || products.length === 0) {
     return null;
   }
@@ -58,7 +56,6 @@ const ProductSection = ({
       id={categorySlug}
       className={`relative ${layout === "grid" ? "mt-4" : "mt-10"}`}
     >
-      {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-3xl font-bold">{title}</h2>
 
@@ -72,25 +69,21 @@ const ProductSection = ({
         )}
       </div>
 
-      {/* ===== GRID LAYOUT (CATEGORY PAGE) ===== */}
       {layout === "grid" ? (
         <div
           className="
-          grid
-          grid-cols-2
-          sm:grid-cols-3
-          md:grid-cols-4
-          lg:grid-cols-6
-          gap-x-3
-          gap-y-4
-        "
+    grid
+    gap-x-3
+    gap-y-4
+    justify-center
+    [grid-template-columns:repeat(auto-fill,250px)]
+  "
         >
           {products.map((product) => (
             <ProductCard key={product._id} product={product} variant="grid" />
           ))}
         </div>
       ) : (
-        /* ===== CAROUSEL LAYOUT (HOME PAGE) ===== */
         <div className="relative">
           {showLeft && (
             <button

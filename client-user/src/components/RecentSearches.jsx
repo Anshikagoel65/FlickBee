@@ -11,7 +11,7 @@ const RecentSearches = () => {
         <h3 className="text-sm font-semibold text-gray-700">Recent searches</h3>
         <button
           onClick={clearRecentSearches}
-          className="text-xs text-green-600 font-medium"
+          className="text-base text-green-600 font-medium"
         >
           Clear
         </button>

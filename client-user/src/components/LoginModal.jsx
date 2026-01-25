@@ -4,14 +4,13 @@ import { sendOtp, verifyOtp } from "../services/authApi";
 import toast from "react-hot-toast";
 
 const LoginModal = () => {
-  const { login, setIsLoginOpen, user, postLoginAction, setPostLoginAction } =
+  const { login, setIsLoginOpen, postLoginAction, setPostLoginAction } =
     useAuthContext();
-
   const [step, setStep] = useState("phone");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(30);
-  console.log("USER FROM AUTH CONTEXT:", user);
+  const [confirmationResult, setConfirmationResult] = useState(null);
 
   const handleSendOtp = async () => {
     if (phone.length !== 10) {
@@ -22,14 +21,15 @@ const LoginModal = () => {
     const loadingToast = toast.loading("Sending OTP...");
 
     try {
-      await sendOtp(`+91${phone}`);
+      const result = await sendOtp(`+91${phone}`);
+      setConfirmationResult(result);
+
       toast.success("OTP sent successfully 📩", { id: loadingToast });
       setStep("otp");
       startTimer();
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to send OTP", {
-        id: loadingToast,
-      });
+      console.error(err);
+      toast.error("Failed to send OTP", { id: loadingToast });
     }
   };
 
@@ -42,13 +42,10 @@ const LoginModal = () => {
     const toastId = toast.loading("Verifying OTP...");
 
     try {
-      const res = await verifyOtp(`+91${phone}`, otp);
-      const { token, phone: userPhone } = res.data;
-
-      if (!token) {
-        console.error("❌ Token missing in response");
-        return;
-      }
+      const { token, phone: userPhone } = await verifyOtp(
+        confirmationResult,
+        otp,
+      );
 
       login(token, userPhone);
 
@@ -62,6 +59,7 @@ const LoginModal = () => {
         }
       }, 1000);
     } catch (err) {
+      console.error(err);
       toast.error("Invalid OTP", { id: toastId });
     }
   };
@@ -89,7 +87,6 @@ const LoginModal = () => {
           ✕
         </button>
 
-        {/* STEP 1: PHONE */}
         {step === "phone" && (
           <>
             <h2 className="text-xl font-bold mb-2">Login or Sign Up</h2>
@@ -115,7 +112,6 @@ const LoginModal = () => {
           </>
         )}
 
-        {/* STEP 2: OTP */}
         {step === "otp" && (
           <>
             <h2 className="text-xl font-bold mb-2">Verify OTP</h2>
@@ -145,7 +141,7 @@ const LoginModal = () => {
               ) : (
                 <button
                   className="text-green-600 font-medium"
-                  onClick={sendOtp}
+                  onClick={handleSendOtp}
                 >
                   Resend OTP
                 </button>

@@ -47,22 +47,15 @@ const CartDrawer = ({ isOpen, onClose }) => {
   };
   return (
     <div className="fixed inset-0 z-50">
-      {/* Overlay */}
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-
-      {/* Drawer */}
       <div className="absolute right-0 top-0 h-full w-full sm:w-[420px] bg-[#f5f7fa] flex flex-col">
-        {/* HEADER (fixed) */}
         <div className="bg-white p-4 flex items-center justify-between shrink-0">
           <h2 className="text-lg font-bold">My Cart</h2>
           <button onClick={onClose}>
             <X />
           </button>
         </div>
-
-        {/* SCROLLABLE CONTENT */}
         <div className="flex-1 overflow-y-auto">
-          {/* Delivery Info */}
           <div className="p-4">
             <div className="bg-white rounded-xl p-4">
               <p className="font-bold">
@@ -88,8 +81,6 @@ const CartDrawer = ({ isOpen, onClose }) => {
               </div>
             </div>
           </div>
-
-          {/* Bill Details */}
           <div className="px-4">
             <BillDetails
               itemsTotal={itemsTotal}
@@ -99,8 +90,6 @@ const CartDrawer = ({ isOpen, onClose }) => {
               grandTotal={grandTotal}
             />
           </div>
-
-          {/* Cancellation Policy */}
           <div className="p-4">
             <div className="bg-white rounded-xl p-4">
               <h3 className="font-bold text-base mb-1">Cancellation Policy</h3>
@@ -111,8 +100,6 @@ const CartDrawer = ({ isOpen, onClose }) => {
             </div>
           </div>
         </div>
-
-        {/* BOTTOM BAR (fixed) */}
         <div className="p-4 bg-white border-t shrink-0">
           <button
             onClick={handleProceed}

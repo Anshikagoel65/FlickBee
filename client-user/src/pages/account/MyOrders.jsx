@@ -12,10 +12,8 @@ const formatDateTime = (date) => {
     hour12: true,
   });
 };
-
 const shortOrderId = (id) => id.slice(-6).toUpperCase();
-
-const API_BASE = "http://localhost:5000";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -46,7 +44,6 @@ const MyOrders = () => {
             key={order._id}
             className="bg-white rounded-xl border p-4 space-y-3"
           >
-            {/* TOP ROW */}
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
@@ -70,8 +67,6 @@ const MyOrders = () => {
                 →
               </button>
             </div>
-
-            {/* ITEMS ROW */}
             <div className="flex gap-3 pt-6">
               {visibleItems.map((item, index) => (
                 <div
@@ -96,7 +91,6 @@ const MyOrders = () => {
         );
       })}
 
-      {/* RECOMMENDATIONS */}
       <OrderRecommendations />
     </div>
   );

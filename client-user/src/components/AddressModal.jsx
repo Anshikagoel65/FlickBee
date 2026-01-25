@@ -1,6 +1,5 @@
 import { X } from "lucide-react";
 import { Home, Building2, MapPin } from "lucide-react";
-
 import { useState, useEffect } from "react";
 import { addAddress, updateAddress } from "../services/addressApi";
 import { useAuthContext } from "../context/AuthContext";
@@ -82,7 +81,6 @@ const AddressModal = ({ onClose, onSave, initialData }) => {
         className="bg-white w-full sm:max-w-md h-full sm:h-auto rounded-none sm:rounded-xl shadow-lg max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* HEADER */}
         <div className="flex justify-between items-center px-5 py-4 border-b sticky top-0 bg-white z-10">
           <h2 className="font-semibold text-lg">
             {initialData ? "Edit address" : "Add new address"}
@@ -91,10 +89,7 @@ const AddressModal = ({ onClose, onSave, initialData }) => {
             <X />
           </button>
         </div>
-
-        {/* SCROLLABLE FORM */}
         <form onSubmit={handleSubmit} className="p-5 space-y-4 overflow-y-auto">
-          {/* ADDRESS TYPE */}
           <div>
             <p className="text-sm text-gray-500 mb-2">Save address as</p>
             <div className="flex gap-3 flex-wrap">

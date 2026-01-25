@@ -14,7 +14,6 @@ import AddressModal from "./AddressModal";
 import { getAddresses, deleteAddress } from "../services/addressApi";
 import { useAuthContext } from "../context/AuthContext";
 
-/* ✅ MOVE THIS HERE (GLOBAL) */
 const getTypeIcon = (type) => {
   switch (type) {
     case "home":
@@ -26,18 +25,17 @@ const getTypeIcon = (type) => {
   }
 };
 
+const NOMINATIM_REVERSE_URL = process.env.REACT_APP_NOMINATIM_REVERSE_URL;
+
 const LocationModal = () => {
   const { setAddress, setDeliveryTime, setIsModalOpen } = useLocationContext();
   const { user } = useAuthContext();
   const [openEditModal, setOpenEditModal] = useState(false);
   const [editData, setEditData] = useState(null);
-
   const [input, setInput] = useState("");
   const [savedAddresses, setSavedAddresses] = useState([]);
-
   const hasSavedAddresses = savedAddresses.length > 0;
 
-  /* 🔹 LOAD SAVED ADDRESSES */
   const loadAddresses = async () => {
     try {
       const res = await getAddresses();
@@ -51,7 +49,6 @@ const LocationModal = () => {
     if (user) loadAddresses();
   }, [user]);
 
-  /* 📍 DETECT LOCATION */
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {
       alert("Geolocation not supported");
@@ -63,7 +60,7 @@ const LocationModal = () => {
         const { latitude, longitude } = position.coords;
 
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+          `${NOMINATIM_REVERSE_URL}?format=json&lat=${latitude}&lon=${longitude}`,
         );
         const data = await res.json();
 
@@ -76,11 +73,10 @@ const LocationModal = () => {
         setDeliveryTime(10);
         setIsModalOpen(false);
       },
-      () => alert("Location permission denied")
+      () => alert("Location permission denied"),
     );
   };
 
-  /* 🔍 CONFIRM SEARCH LOCATION */
   const handleConfirmLocation = () => {
     if (!input.trim()) return;
 
@@ -95,13 +91,11 @@ const LocationModal = () => {
 
   return (
     <>
-      {/* OVERLAY */}
       <div
         className="fixed inset-0 bg-black/40 z-40"
         onClick={() => setIsModalOpen(false)}
       />
 
-      {/* MODAL */}
       <div
         className="
           fixed z-50 bg-[#f5f7fa]
@@ -110,15 +104,12 @@ const LocationModal = () => {
           md:bottom-auto md:w-[520px] md:rounded-xl
         "
       >
-        {/* HEADER */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Change Location</h2>
           <button onClick={() => setIsModalOpen(false)}>
             <X size={22} />
           </button>
         </div>
-
-        {/* DETECT + SEARCH */}
         <div className="flex items-center gap-3 mb-4">
           <button
             onClick={handleDetectLocation}
@@ -136,8 +127,6 @@ const LocationModal = () => {
             className="flex-1 px-3 py-2 border rounded-lg outline-none"
           />
         </div>
-
-        {/* SAVED ADDRESSES */}
         {hasSavedAddresses && (
           <>
             <div className="text-sm text-gray-500 mb-2">
@@ -153,7 +142,7 @@ const LocationModal = () => {
                     setAddress(
                       `${addr.houseNo}, ${addr.street1}${
                         addr.landmark ? ", " + addr.landmark : ""
-                      }`
+                      }`,
                     );
 
                     setDeliveryTime(15);
@@ -172,8 +161,6 @@ const LocationModal = () => {
             </div>
           </>
         )}
-
-        {/* CONFIRM */}
         <button
           onClick={handleConfirmLocation}
           className="w-full bg-black text-white py-3 rounded-lg mt-4"
@@ -199,20 +186,15 @@ const LocationModal = () => {
   );
 };
 
-/* ✅ ADDRESS ITEM */
 const AddressItem = ({ address, onSelect, onEdit, onDelete }) => {
   const [open, setOpen] = useState(false);
 
   return (
     <div className="bg-white rounded-xl p-4 flex justify-between items-start hover:bg-gray-50 transition">
-      {/* LEFT */}
       <div className="flex gap-3 cursor-pointer items-start" onClick={onSelect}>
-        {/* ICON */}
         <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
           {getTypeIcon(address.type)}
         </div>
-
-        {/* TEXT */}
         <div>
           <p className="font-semibold capitalize">{address.type}</p>
           <p className="text-sm text-gray-600">
@@ -220,8 +202,6 @@ const AddressItem = ({ address, onSelect, onEdit, onDelete }) => {
           </p>
         </div>
       </div>
-
-      {/* MENU */}
       <div className="relative">
         <button onClick={() => setOpen(!open)}>
           <MoreVertical size={18} />

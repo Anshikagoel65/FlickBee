@@ -17,7 +17,6 @@ const OrderRecommendations = () => {
 
   return (
     <div className="pt-20 pb-20">
-      {/* HEADER */}
       <div className="flex justify-between items-center mb-4 px-1">
         <h2 className="text-2xl font-bold">Recommended for you</h2>
         <button
@@ -27,13 +26,10 @@ const OrderRecommendations = () => {
           See all
         </button>
       </div>
-
-      {/* HORIZONTAL SCROLL */}
       <div className="overflow-x-auto scrollbar-hide snap-x snap-mandatory">
         <div className="flex gap-1 min-w-max px-1">
           {products.map((product) => (
             <div key={product._id} className="flex-shrink-0 w-[280px]">
-              {/* FAKE FULL WIDTH CONTEXT */}
               <div className="w-[1200px]">
                 <div className="w-[280px]">
                   <ProductCard product={product} variant="carousel" />

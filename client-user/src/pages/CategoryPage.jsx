@@ -50,19 +50,15 @@ const CategoryPage = () => {
     gap-4
   "
     >
-      {/* LEFT SIDEBAR */}
       <CategorySidebar
         categories={reorderedCategories}
         activeSlug={slug}
         variant="responsive"
       />
-
-      {/* RIGHT CONTENT */}
-      <div className="flex-1">
-        {/* CATEGORY TITLE (TOP) */}
+      <div className="flex-1 min-w-0">
         {activeCategory && (
           <div className="bg-white sticky top-0 z-20 px-2 py-3 border-b">
-            <h1 className="text-xl font-bold">{activeCategory.name}</h1>
+            <h1 className="text-3xl font-bold">{activeCategory.name}</h1>
           </div>
         )}
 

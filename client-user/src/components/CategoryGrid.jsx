@@ -2,14 +2,13 @@ import { useEffect, useState } from "react";
 import { fetchUserCategories } from "../services/categoryApi";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
-const CategoryGrid = ({ onCategorySelect }) => {
+const CategoryGrid = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ define function BEFORE useEffect
   const loadCategories = async () => {
     try {
       const res = await fetchUserCategories();
@@ -25,12 +24,10 @@ const CategoryGrid = ({ onCategorySelect }) => {
     loadCategories();
   }, []);
 
-  /* 🔄 LOADING STATE */
   if (loading) {
     return <p className="mt-6 text-gray-500">Loading categories…</p>;
   }
 
-  /* 🚫 EMPTY STATE */
   if (categories.length === 0) {
     return <p className="mt-6 text-gray-500">No categories available</p>;
   }
@@ -53,7 +50,6 @@ const CategoryGrid = ({ onCategorySelect }) => {
             onClick={() => navigate(`/category/${cat.slug}`)}
             className="flex flex-col items-center cursor-pointer"
           >
-            {/* IMAGE TILE */}
             <div
               className="
                 w-20 h-20
@@ -80,8 +76,6 @@ const CategoryGrid = ({ onCategorySelect }) => {
                 </div>
               )}
             </div>
-
-            {/* LABEL */}
             <p className="mt-2 text-sm sm:text-base text-center font-medium text-gray-800 leading-tight">
               {cat.name}
             </p>

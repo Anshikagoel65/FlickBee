@@ -1,7 +1,7 @@
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 const ProductCard = ({ product, variant = "carousel" }) => {
   const navigate = useNavigate();
@@ -32,14 +32,12 @@ const ProductCard = ({ product, variant = "carousel" }) => {
     snap-start
   "
     >
-      {/* DISCOUNT */}
       {discountPercent > 0 && (
         <span className="absolute top-2 right-2 bg-yellow-400 text-black text-sm font-semibold px-2 py-0.5 rounded-md">
           Save {discountPercent}%
         </span>
       )}
 
-      {/* IMAGE */}
       <div className="h-36 rounded-xl overflow-hidden mb-2 flex items-center justify-center">
         <img
           src={`${API_BASE}${product.images?.[0] || product.thumbnail}`}
@@ -48,17 +46,14 @@ const ProductCard = ({ product, variant = "carousel" }) => {
         />
       </div>
 
-      {/* NAME */}
       <h3 className="text-lg font-semibold leading-snug line-clamp-2 mb-2">
         {product.name}
       </h3>
 
-      {/* QUANTITY */}
       <p className="text-sm text-gray-500 mb-2">
         {product.quantity?.[0]} {product.unit?.[0]}
       </p>
 
-      {/* PRICE */}
       <div className="flex items-center gap-2 mb-1">
         <span className="text-sm font-bold">₹{product.price}</span>
         {product.mrp > product.price && (
@@ -68,16 +63,14 @@ const ProductCard = ({ product, variant = "carousel" }) => {
         )}
       </div>
 
-      {/* LIMITED TIME */}
       {discountPercent > 0 && (
         <p className="text-sm text-red-500 font-medium">Limited Time</p>
       )}
 
-      {/* CART */}
       {quantity === 0 ? (
         <button
           onClick={(e) => {
-            e.stopPropagation(); // 🚫 prevent navigation
+            e.stopPropagation();
             addToCart(product);
           }}
           className="absolute bottom-3 right-3 px-4 py-1 border border-green-600 text-green-600 rounded-lg text-sm font-medium"

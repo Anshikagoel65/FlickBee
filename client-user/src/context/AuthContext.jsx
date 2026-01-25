@@ -10,10 +10,8 @@ export const AuthProvider = ({ children }) => {
   const [postLoginAction, setPostLoginAction] = useState(null);
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
-
   const isAuthenticated = !!user;
 
-  // ✅ LOAD USER FROM LOCAL STORAGE ON REFRESH
   useEffect(() => {
     const token = localStorage.getItem("token");
     const savedUser = localStorage.getItem("user");
@@ -58,14 +56,13 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const handleLogout = () => {
       setUser(null);
-      setIsLoginOpen(true); // optional: open login modal
+      setIsLoginOpen(true);
     };
 
     window.addEventListener("logout", handleLogout);
     return () => window.removeEventListener("logout", handleLogout);
   }, []);
 
-  // ✅ CALL THIS AFTER OTP VERIFY
   const login = (token, phone) => {
     const userData = { phone };
 
@@ -81,7 +78,6 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
-  // 🚪 LOGOUT
   const logout = () => {
     localStorage.clear();
     setUser(null);

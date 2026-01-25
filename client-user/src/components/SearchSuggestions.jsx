@@ -2,6 +2,7 @@ import { useSearch } from "../context/SearchContext";
 import { useEffect, useState } from "react";
 import { getProducts } from "../services/productApi";
 
+const API_BASE = process.env.REACT_APP_API_BASE;
 const SearchSuggestions = () => {
   const { searchQuery } = useSearch();
   const [suggestions, setSuggestions] = useState([]);
@@ -32,11 +33,11 @@ const SearchSuggestions = () => {
         >
           <div className="w-8 h-8 bg-gray-200 rounded flex items-center justify-center text-xs">
             <img
-              src={`http://localhost:5000${item.image}`}
+              src={`${API_BASE}${item.thumbnail || item.images?.[0] || ""}`}
               alt={item.name}
               className="w-full h-full object-cover"
               onError={(e) => {
-                e.target.src = "/placeholder.png"; // optional fallback
+                e.currentTarget.src = "/placeholder.png";
               }}
             />
           </div>

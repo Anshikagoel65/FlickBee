@@ -1,6 +1,5 @@
 import apiClient from "./apiClient";
 
-// ✅ MUST MATCH BACKEND ROUTES
 export const getAddresses = () => apiClient.get("/address");
 
 export const addAddress = (data) =>

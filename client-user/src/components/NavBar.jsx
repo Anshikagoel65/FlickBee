@@ -1,12 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Search, MapPin, ChevronDown, User, ShoppingCart } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-
 import LocationModal from "./LocationModal";
 import LoginModal from "./LoginModal";
 import CartDrawer from "./CartDrawer";
 import AddressDrawer from "./AddressDrawer";
-
 import { useLocationContext } from "../context/LocationContext";
 import { useAuthContext } from "../context/AuthContext";
 import { useSearch } from "../context/SearchContext";
@@ -14,11 +12,9 @@ import { useCart } from "../context/CartContext";
 
 const NavBar = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
-
   const navigate = useNavigate();
   const location = useLocation();
   const isSearchPage = location.pathname === "/search";
-
   const { searchQuery, setSearchQuery } = useSearch();
   const { addRecentSearch } = useSearch();
   const { cart } = useCart();
@@ -56,19 +52,14 @@ const NavBar = () => {
   return (
     <>
       <nav className="fixed top-0 left-0 w-full bg-white shadow-md z-50">
-        {/* ================= DESKTOP ================= */}
         {isSearchPage ? (
-          /* 🔍 SEARCH PAGE – DESKTOP ONLY */
           <div className="hidden md:flex items-center gap-8 px-4 h-16 max-w-[1400px] mx-auto">
-            {/* Logo */}
             <h1
               onClick={() => navigate("/")}
               className="text-4xl font-extrabold text-green-600 cursor-pointer"
             >
               Flick<span className="text-black">Bee</span>
             </h1>
-
-            {/* Search */}
             <div className="flex-1 relative">
               <Search
                 size={18}
@@ -87,8 +78,6 @@ const NavBar = () => {
                 className="w-full bg-gray-50 pl-10 pr-4 py-2 border rounded-lg focus:outline-none"
               />
             </div>
-
-            {/* Cart */}
             <button
               onClick={() => setIsCartOpen(true)}
               className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
@@ -104,9 +93,7 @@ const NavBar = () => {
             </button>
           </div>
         ) : (
-          /* 🏠 HOME – DESKTOP */
           <div className="hidden md:flex items-center justify-between px-8 h-20">
-            {/* Left */}
             <div className="flex items-center gap-14">
               <h1 className="text-4xl font-extrabold text-green-600">
                 Flick<span className="text-black">Bee</span>
@@ -130,8 +117,6 @@ const NavBar = () => {
                 </div>
               </div>
             </div>
-
-            {/* Search */}
             <div className="flex-1 max-w-[700px] mx-10 relative">
               <Search
                 size={18}
@@ -150,10 +135,7 @@ const NavBar = () => {
                 className="w-full bg-gray-50 pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-green-500"
               />
             </div>
-
-            {/* Right */}
             <div className="flex items-center gap-10">
-              {/* 🔐 LOGIN / ACCOUNT */}
               {!user && (
                 <button
                   onClick={() => setIsLoginOpen(true)}
@@ -162,8 +144,6 @@ const NavBar = () => {
                   Login
                 </button>
               )}
-
-              {/* ✅ ACCOUNT DROPDOWN */}
               {user && (
                 <div ref={accountRef} className="relative">
                   <button
@@ -234,9 +214,7 @@ const NavBar = () => {
           </div>
         )}
 
-        {/* ================= MOBILE (SAME FOR ALL PAGES) ================= */}
         <div className="md:hidden px-4 py-3">
-          {/* Top Row */}
           <div className="flex items-center justify-between">
             <div
               className="cursor-pointer"
@@ -268,8 +246,6 @@ const NavBar = () => {
               <User />
             </button>
           </div>
-
-          {/* Search Bar */}
           <div className="mt-3 relative">
             <Search
               size={18}
@@ -290,8 +266,6 @@ const NavBar = () => {
           </div>
         </div>
       </nav>
-
-      {/* ================= MOBILE CART BAR ================= */}
       {cartCount > 0 && !isCartOpen && (
         <div
           className="
@@ -330,7 +304,6 @@ const NavBar = () => {
         </div>
       )}
 
-      {/* Modals */}
       {isModalOpen && <LocationModal />}
       {isLoginOpen && <LoginModal />}
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />

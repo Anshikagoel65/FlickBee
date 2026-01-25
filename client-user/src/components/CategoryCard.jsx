@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:5000";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 const CategoryCard = ({ category }) => {
   const handleClick = () => {
@@ -13,7 +13,6 @@ const CategoryCard = ({ category }) => {
       onClick={handleClick}
       className="flex flex-col items-center cursor-pointer"
     >
-      {/* IMAGE */}
       <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-gray-100">
         {category.image ? (
           <img
@@ -27,8 +26,6 @@ const CategoryCard = ({ category }) => {
           </div>
         )}
       </div>
-
-      {/* LABEL */}
       <p className="mt-2 text-xs sm:text-sm text-center font-medium text-gray-700">
         {category.name}
       </p>

@@ -10,7 +10,6 @@ import { useEffect, useState } from "react";
 import { getAddresses, deleteAddress } from "../../services/addressApi";
 import AddressModal from "../../components/AddressModal";
 
-/* ICON BY TYPE */
 const getTypeIcon = (type) => {
   switch (type) {
     case "home":
@@ -44,7 +43,6 @@ const MyAddresses = () => {
 
   return (
     <div className="bg-white rounded-xl p-6">
-      {/* HEADER */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">My addresses</h2>
         <button
@@ -57,8 +55,6 @@ const MyAddresses = () => {
           + Add new address
         </button>
       </div>
-
-      {/* EMPTY STATE */}
       {addresses.length === 0 ? (
         <p className="text-gray-500 mt-10 text-center">No saved addresses</p>
       ) : (
@@ -68,7 +64,6 @@ const MyAddresses = () => {
               key={a._id}
               className="border rounded-lg p-4 flex justify-between items-start relative"
             >
-              {/* LEFT */}
               <div className="flex gap-3">
                 <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
                   {getTypeIcon(a.type)}
@@ -82,7 +77,6 @@ const MyAddresses = () => {
                 </div>
               </div>
 
-              {/* RIGHT (⋮ MENU) */}
               <button
                 onClick={() =>
                   setMenuOpenId(menuOpenId === a._id ? null : a._id)
@@ -121,7 +115,6 @@ const MyAddresses = () => {
         </div>
       )}
 
-      {/* MODAL */}
       {openModal && (
         <AddressModal
           initialData={editData}

@@ -4,7 +4,7 @@ import { getOrderById } from "../../services/orderApi";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Download } from "lucide-react";
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
 const OrderInvoice = () => {
   const { orderId } = useParams();
@@ -21,17 +21,13 @@ const OrderInvoice = () => {
 
   return (
     <div className="max-w-3xl mx-auto p-4 space-y-6">
-      {/* TOP ACTION BAR */}
       <div className="flex items-center justify-between">
-        {/* BACK BUTTON */}
         <button
           onClick={() => navigate(-1)}
           className="w-10 h-10 rounded-lg border flex items-center justify-center hover:bg-gray-50"
         >
           <ArrowLeft size={18} />
         </button>
-
-        {/* DOWNLOAD */}
         <button
           onClick={() => window.print()}
           className="flex items-center gap-2 text-green-600 text-sm font-medium"
@@ -40,8 +36,6 @@ const OrderInvoice = () => {
           Download Invoice
         </button>
       </div>
-
-      {/* HEADER */}
       <div className="bg-white rounded-xl border p-4">
         <h1 className="text-xl font-bold">
           Invoice #{order._id.slice(-6).toUpperCase()}
@@ -50,8 +44,6 @@ const OrderInvoice = () => {
           Placed on {new Date(order.createdAt).toLocaleString("en-IN")}
         </p>
       </div>
-
-      {/* ITEMS */}
       <div className="bg-white rounded-xl border p-4 space-y-4">
         <h2 className="font-bold">Items</h2>
 
@@ -74,8 +66,6 @@ const OrderInvoice = () => {
           </div>
         ))}
       </div>
-
-      {/* BILL SUMMARY */}
       <div className="bg-white rounded-xl border p-4 space-y-2">
         <h2 className="font-bold">Bill Summary</h2>
 
@@ -101,8 +91,6 @@ const OrderInvoice = () => {
           <span>₹{order.grandTotal}</span>
         </div>
       </div>
-
-      {/* ADDRESS */}
 
       <div className="bg-white rounded-xl border p-4">
         <h2 className="font-bold mb-2">Delivered to</h2>

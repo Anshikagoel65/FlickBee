@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = process.env.REACT_APP_API_BASE;
 
-const CategorySidebar = ({ categories, activeSlug, variant }) => {
+const CategorySidebar = ({ categories, activeSlug }) => {
   const navigate = useNavigate();
 
   return (
@@ -38,7 +38,6 @@ const CategorySidebar = ({ categories, activeSlug, variant }) => {
                     : "hover:bg-gray-100"
                 }`}
             >
-              {/* IMAGE */}
               <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden bg-gray-100">
                 <img
                   src={`${API_BASE}${cat.image}`}
@@ -47,7 +46,6 @@ const CategorySidebar = ({ categories, activeSlug, variant }) => {
                 />
               </div>
 
-              {/* NAME */}
               <p
                 className={`mt-1 text-[13px] text-center leading-tight
                   ${
