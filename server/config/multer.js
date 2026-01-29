@@ -3,7 +3,6 @@ const path = require("path");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // 🔥 detect route
     if (req.originalUrl.includes("products")) {
       cb(null, "uploads/products");
     } else if (req.originalUrl.includes("categories")) {

@@ -59,8 +59,12 @@ const LoginModal = () => {
         }
       }, 1000);
     } catch (err) {
-      console.error(err);
-      toast.error("Invalid OTP", { id: toastId });
+      toast.error(
+        err.code === "auth/code-expired"
+          ? "OTP expired. Please resend."
+          : "Invalid OTP",
+        { id: toastId },
+      );
     }
   };
 
@@ -99,7 +103,7 @@ const LoginModal = () => {
               maxLength="10"
               placeholder="Enter mobile number"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
               className="w-full border px-4 py-2 rounded-lg mb-4 focus:outline-none focus:ring-1 focus:ring-green-500"
             />
 

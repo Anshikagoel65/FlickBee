@@ -6,46 +6,44 @@ let recaptchaVerifierInstance = null;
 const getRecaptchaVerifier = () => {
   if (!recaptchaVerifierInstance) {
     recaptchaVerifierInstance = new RecaptchaVerifier(
-      auth,
-      "recaptcha-container",
+      "recaptcha-container", // ✅ container FIRST
       {
         size: "invisible",
-        callback: () => {},
-        "expired-callback": () => {},
+        callback: () => {
+          console.log("reCAPTCHA verified");
+        },
       },
+      auth, // ✅ auth LAST
     );
-
-    recaptchaVerifierInstance.render();
   }
-
   return recaptchaVerifierInstance;
-};
-
-export const resetRecaptcha = async () => {
-  if (recaptchaVerifierInstance) {
-    await recaptchaVerifierInstance.clear();
-    recaptchaVerifierInstance = null;
-  }
 };
 
 export const sendOtp = async (phone) => {
   try {
     const verifier = getRecaptchaVerifier();
-    return await signInWithPhoneNumber(auth, phone, verifier);
+    const confirmationResult = await signInWithPhoneNumber(
+      auth,
+      phone,
+      verifier,
+    );
+    return confirmationResult;
   } catch (error) {
-    console.error("Firebase OTP error:", error);
-    await resetRecaptcha();
+    if (recaptchaVerifierInstance) {
+      recaptchaVerifierInstance.clear();
+      recaptchaVerifierInstance = null;
+    }
     throw error;
   }
 };
 
 export const verifyOtp = async (confirmationResult, otp) => {
-  const credential = await confirmationResult.confirm(otp);
-  const token = await credential.user.getIdToken();
+  const result = await confirmationResult.confirm(otp);
+  const token = await result.user.getIdToken();
 
   return {
     token,
-    phone: credential.user.phoneNumber,
-    user: credential.user,
+    phone: result.user.phoneNumber,
+    user: result.user,
   };
 };

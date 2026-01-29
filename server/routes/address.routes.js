@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Address = require("../models/Address");
-const auth = require("../middleware/authMiddleware"); // JWT middleware
+const auth = require("../middleware/authMiddleware");
 
 // ➕ ADD ADDRESS
 router.post("/", auth, async (req, res) => {
@@ -116,7 +116,7 @@ router.put("/:id", auth, async (req, res) => {
         type,
         isDefault,
       },
-      { new: true }
+      { new: true },
     );
 
     res.json(address);
