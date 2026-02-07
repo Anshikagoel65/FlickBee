@@ -10,7 +10,6 @@ const LoginModal = () => {
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(30);
-  const [confirmationResult, setConfirmationResult] = useState(null);
 
   const handleSendOtp = async () => {
     if (phone.length !== 10) {
@@ -18,18 +17,15 @@ const LoginModal = () => {
       return;
     }
 
-    const loadingToast = toast.loading("Sending OTP...");
-
+    const toastId = toast.loading("Sending OTP...");
     try {
-      const result = await sendOtp(`+91${phone}`);
-      setConfirmationResult(result);
-
-      toast.success("OTP sent successfully 📩", { id: loadingToast });
+      await sendOtp(`+91${phone}`);
+      toast.success("OTP sent successfully 📩", { id: toastId });
       setStep("otp");
       startTimer();
     } catch (err) {
       console.error(err);
-      toast.error("Failed to send OTP", { id: loadingToast });
+      toast.error("Failed to send OTP", { id: toastId });
     }
   };
 
@@ -40,12 +36,8 @@ const LoginModal = () => {
     }
 
     const toastId = toast.loading("Verifying OTP...");
-
     try {
-      const { token, phone: userPhone } = await verifyOtp(
-        confirmationResult,
-        otp,
-      );
+      const { token, phone: userPhone } = await verifyOtp(`+91${phone}`, otp);
 
       login(token, userPhone);
 
@@ -57,14 +49,11 @@ const LoginModal = () => {
           postLoginAction();
           setPostLoginAction(null);
         }
-      }, 1000);
+      }, 800);
     } catch (err) {
-      toast.error(
-        err.code === "auth/code-expired"
-          ? "OTP expired. Please resend."
-          : "Invalid OTP",
-        { id: toastId },
-      );
+      toast.error(err.response?.data?.message || "Invalid or expired OTP", {
+        id: toastId,
+      });
     }
   };
 
@@ -128,7 +117,7 @@ const LoginModal = () => {
               maxLength="6"
               placeholder="Enter OTP"
               value={otp}
-              onChange={(e) => setOtp(e.target.value)}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
               className="w-full border px-4 py-2 rounded-lg mb-3 text-center tracking-widest text-lg"
             />
 

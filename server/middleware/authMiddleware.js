@@ -1,22 +1,20 @@
-const admin = require("../config/firebase"); // firebase-admin init
+const jwt = require("jsonwebtoken");
 
-const authMiddleware = async (req, res, next) => {
+const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
+
   if (!authHeader) {
     return res.status(401).json({ message: "Token missing" });
   }
 
-  const token = authHeader.split(" ")[1];
+  const token = authHeader.split(" ")[1]; // Bearer TOKEN
 
   try {
-    const decoded = await admin.auth().verifyIdToken(token);
-    req.user = {
-      uid: decoded.uid,
-      phone: decoded.phone_number,
-    };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // { phone }
     next();
   } catch (err) {
-    return res.status(401).json({ message: "Invalid Firebase token" });
+    return res.status(401).json({ message: "Invalid token" });
   }
 };
 

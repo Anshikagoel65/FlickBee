@@ -19,7 +19,11 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 /* 🔥 THEN CORS */
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:5173"],
+    origin: [
+      "http://flickbee-user.s3-website-us-east-1.amazonaws.com",
+      "https://flickbees.in",
+      "https://www.flickbees.in",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -28,11 +32,11 @@ app.use(
 
 app.use(express.json());
 
-app.use("/api/admin", adminRoutes); // 🔴 ADMIN
-app.use("/api", userRoutes); // 🔵 USER
+app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/address", addressRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api", userRoutes);
 
 /* DB */
 connectDB();

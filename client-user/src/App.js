@@ -22,7 +22,6 @@ function App() {
 
   return (
     <>
-      <div id="recaptcha-container"></div>
       <BrowserRouter>
         <Toaster position="top-center" reverseOrder={false} />
         <NavBar />

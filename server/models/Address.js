@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const addressSchema = new mongoose.Schema(
   {
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       ref: "User",
       required: true,
       index: true,
@@ -80,7 +80,7 @@ const addressSchema = new mongoose.Schema(
   },
   {
     timestamps: { createdAt: true, updatedAt: true },
-  }
+  },
 );
 
 module.exports = mongoose.model("Address", addressSchema);
