@@ -53,13 +53,13 @@ const NavBar = () => {
     <>
       <nav className="fixed top-0 left-0 w-full bg-white shadow-md z-50">
         {isSearchPage ? (
-          <div className="hidden md:flex items-center gap-8 px-4 h-16 max-w-[1400px] mx-auto">
-            <h1
+          <div className="hidden md:flex items-center gap-6 h-16 max-w-[1400px] mx-auto">
+            <img
+              src="/logo.png"
+              alt="FlickBee Logo"
               onClick={() => navigate("/")}
-              className="text-4xl font-extrabold text-green-600 cursor-pointer"
-            >
-              Flick<span className="text-black">Bee</span>
-            </h1>
+              className="h-20 cursor-pointer"
+            />
             <div className="flex-1 relative">
               <Search
                 size={18}
@@ -94,11 +94,13 @@ const NavBar = () => {
           </div>
         ) : (
           <div className="hidden md:flex items-center justify-between px-8 h-20">
-            <div className="flex items-center gap-14">
-              <h1 className="text-4xl font-extrabold text-green-600">
-                Flick<span className="text-black">Bee</span>
-              </h1>
-
+            <div className="flex items-center gap-10">
+              <img
+                src="/logo.png"
+                alt="FlickBee Logo"
+                onClick={() => navigate("/")}
+                className="h-24 cursor-pointer"
+              />
               <div
                 className="cursor-pointer"
                 onClick={() => setIsModalOpen(true)}

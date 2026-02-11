@@ -16,16 +16,23 @@ const app = express();
 /* 🔥 STATIC FIRST */
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-/* 🔥 THEN CORS */
+const allowedOrigins = [
+  "http://flickbee-user.s3-website-us-east-1.amazonaws.com",
+  "https://flickbees.in",
+  "https://www.flickbees.in",
+  "https://flickbees.com",
+  "https://www.flickbees.com",
+];
+
 app.use(
   cors({
-    origin: [
-      "http://flickbee-user.s3-website-us-east-1.amazonaws.com",
-      "https://flickbees.in",
-      "https://www.flickbees.in",
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   }),
 );
