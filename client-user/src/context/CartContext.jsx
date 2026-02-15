@@ -13,33 +13,50 @@ export const CartProvider = ({ children }) => {
   }, [cart]);
 
   const addToCart = (product) => {
+    const variant =
+      product.selectedVariant ||
+      product.variants?.find((v) => v.isDefault) ||
+      product.variants?.[0];
+
+    if (!variant) return;
+
+    const cartKey = `${product._id}_${variant._id}`;
+
     setCart((prev) => {
-      const existing = prev[product._id];
+      const existing = prev[cartKey];
 
       return {
         ...prev,
-        [product._id]: {
-          ...product,
+        [cartKey]: {
+          id: cartKey,
+          productId: product._id,
+          variantId: variant._id,
+          name: product.name,
+          thumbnail: product.thumbnail,
+          price: variant.price,
+          mrp: variant.mrp,
+          quantity: variant.quantity,
+          unit: variant.unit,
           cartQty: existing ? existing.cartQty + 1 : 1,
         },
       };
     });
   };
 
-  const removeFromCart = (product) => {
+  const removeFromCart = (item) => {
     setCart((prev) => {
-      const existing = prev[product._id];
+      const existing = prev[item.id];
       if (!existing) return prev;
 
       if (existing.cartQty === 1) {
         const updated = { ...prev };
-        delete updated[product._id];
+        delete updated[item.id];
         return updated;
       }
 
       return {
         ...prev,
-        [product._id]: {
+        [item.id]: {
           ...existing,
           cartQty: existing.cartQty - 1,
         },

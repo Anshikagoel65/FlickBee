@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-/* LOGICAL GROUPING (NOT UI TEXT) */
 const PRODUCT_TYPES = [
   "grocery",
   "snacks",
@@ -15,165 +14,157 @@ const PRODUCT_TYPES = [
 const UNIT_TYPES = ["gram", "kg", "ml", "liter", "piece"];
 const PRODUCT_STATUS = ["active", "inactive", "outOfStock"];
 
-/* STORE LEVEL INFO */
-const storeProductInfoSchema = new mongoose.Schema(
+/* ===============================
+   STORE VARIANT INFO
+================================ */
+
+const storeVariantSchema = new mongoose.Schema(
   {
-    stock: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
-    maxOrderQuantity: {
-      type: Number,
-      required: true,
-    },
-    isAvailable: {
-      type: Boolean,
-      default: true,
-    },
-    storePriceOverride: {
-      type: Number,
-    },
+    stock: { type: Number, default: 0, min: 0 },
+    isAvailable: { type: Boolean, default: true },
+    storePriceOverride: { type: Number, min: 0 },
   },
   { _id: false },
 );
 
+/* ===============================
+   VARIANT SCHEMA
+================================ */
+
+const variantSchema = new mongoose.Schema(
+  {
+    quantity: { type: Number, required: true },
+    unit: { type: String, enum: UNIT_TYPES, required: true },
+
+    price: { type: Number, required: true, min: 0 },
+    mrp: { type: Number, required: true, min: 0 },
+
+    sku: { type: String }, // optional
+
+    stock: { type: Number, default: 0, min: 0 },
+    isAvailable: { type: Boolean, default: true },
+
+    storeInfo: {
+      type: Map,
+      of: storeVariantSchema,
+      default: {},
+    },
+  },
+  { _id: true },
+);
+
+/* ===============================
+   MAIN PRODUCT SCHEMA
+================================ */
+
 const productSchema = new mongoose.Schema(
   {
     /* BASIC INFO */
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    name: { type: String, required: true, trim: true },
+    description: { type: String, required: true },
+    brandName: { type: String, default: "FlickBee" },
 
-    description: {
-      type: String,
-      required: true,
-    },
+    keywords: { type: [String], default: [], index: true },
 
-    keywords: {
-      type: [String],
-      default: [],
-      index: true,
-    },
-
-    /* UI CATEGORY (FROM CATEGORY COLLECTION) */
+    /* CATEGORY */
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
       required: true,
+      index: true,
     },
 
-    /* LOGICAL GROUP (FOR FILTERS & ANALYTICS) */
     productType: {
       type: String,
       enum: PRODUCT_TYPES,
       required: true,
+      index: true,
     },
 
-    /* PRICING */
-    price: {
-      type: Number, // selling price
-      required: true,
-    },
-
-    mrp: {
-      type: Number,
-      required: true,
-    },
-
-    taxPercent: {
-      type: Number,
-      default: 0,
-    },
+    /* TAX */
+    taxPercent: { type: Number, default: 0, min: 0 },
 
     /* VARIANTS */
-    quantity: {
-      type: [Number], // e.g. [500, 1000]
-      required: true,
-    },
-
-    unit: {
-      type: [String],
-      enum: UNIT_TYPES,
-      required: true,
+    variants: {
+      type: [variantSchema],
+      validate: {
+        validator: (v) => v.length > 0,
+        message: "At least one variant required",
+      },
     },
 
     /* OPTIONAL DETAILS */
-    highlights: {
-      type: Map,
-      of: String,
-    },
-
-    keyDetails: {
-      type: Map,
-      of: String,
-    },
+    highlights: { type: Map, of: String },
+    keyDetails: { type: Map, of: String },
 
     /* MEDIA */
     images: {
       type: [String],
       required: true,
+      validate: (v) => v.length > 0,
     },
 
-    thumbnail: {
-      type: String,
-      required: true,
-    },
+    thumbnail: { type: String },
 
-    /* AVAILABILITY */
+    /* PRODUCT STATUS */
     status: {
       type: String,
       enum: PRODUCT_STATUS,
       default: "active",
+      index: true,
     },
 
-    isCODAvailable: {
-      type: Boolean,
-      default: true,
-    },
-
-    isSubstitutable: {
-      type: Boolean,
-      default: true,
-    },
+    isCODAvailable: { type: Boolean, default: true },
+    isSubstitutable: { type: Boolean, default: true },
 
     /* COMPLIANCE */
-    isVegetarian: {
-      type: Boolean,
-      default: true,
-    },
-
-    isFragile: {
-      type: Boolean,
-      default: false,
-    },
-
-    isAgeRestricted: {
-      type: Boolean,
-      default: false,
-    },
+    isVegetarian: { type: Boolean, default: true },
+    isFragile: { type: Boolean, default: false },
+    isAgeRestricted: { type: Boolean, default: false },
 
     /* RATINGS */
-    averageRating: {
-      type: Number,
-      default: 0,
-    },
-
-    ratingCount: {
-      type: Number,
-      default: 0,
-    },
-
-    /* STORE LEVEL DATA */
-    storeInfo: {
-      type: Map,
-      of: storeProductInfoSchema,
-      default: {},
-    },
+    averageRating: { type: Number, default: 0, min: 0, max: 5 },
+    ratingCount: { type: Number, default: 0, min: 0 },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
 );
+
+/* ===============================
+   VIRTUALS
+================================ */
+
+// Lowest price variant
+productSchema.virtual("minPrice").get(function () {
+  if (!this.variants.length) return 0;
+  return Math.min(...this.variants.map((v) => v.price));
+});
+
+// Overall availability
+productSchema.virtual("isAvailable").get(function () {
+  if (this.status === "outOfStock") return false;
+  return this.variants.some((v) => v.stock > 0 && v.isAvailable);
+});
+
+/* ===============================
+   MIDDLEWARE
+================================ */
+
+productSchema.pre("save", function () {
+  if (!this.thumbnail && this.images.length > 0) {
+    this.thumbnail = this.images[0];
+  }
+});
+
+/* ===============================
+   INDEXES
+================================ */
+
+productSchema.index({ name: "text", keywords: "text" });
+productSchema.index({ category: 1, productType: 1 });
+productSchema.index({ status: 1 });
 
 module.exports = mongoose.model("Product", productSchema);

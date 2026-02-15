@@ -17,11 +17,12 @@ const app = express();
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const allowedOrigins = [
-  "http://flickbee-user.s3-website-us-east-1.amazonaws.com",
   "https://flickbees.in",
   "https://www.flickbees.in",
   "https://flickbees.com",
   "https://www.flickbees.com",
+  "http://localhost:3000",
+  "http://localhost:5173",
 ];
 
 app.use(

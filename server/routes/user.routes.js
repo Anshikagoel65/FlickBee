@@ -13,7 +13,10 @@ router.get("/categories", async (req, res) => {
 
 /* USER: Products */
 router.get("/products", async (req, res) => {
-  const products = await Product.find().populate("category");
+  const products = await Product.find({
+    status: "active",
+  }).populate("category");
+
   res.json(products);
 });
 

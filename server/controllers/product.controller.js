@@ -1,6 +1,7 @@
 const Product = require("../models/Product");
 
-// ADMIN: add product
+/* ================= ADMIN: ADD PRODUCT ================= */
+
 exports.addProduct = async (req, res) => {
   try {
     const {
@@ -8,18 +9,34 @@ exports.addProduct = async (req, res) => {
       description,
       category,
       productType,
-      price,
-      mrp,
-      quantity,
-      unit,
+      taxPercent,
+      variants,
+      status,
+      isCODAvailable,
+      isSubstitutable,
+      isVegetarian,
+      isFragile,
+      isAgeRestricted,
+      brandName,
+      keywords,
     } = req.body;
 
     if (!req.files || !req.files.length) {
       return res.status(400).json({ message: "Images are required" });
     }
 
+    if (!variants) {
+      return res.status(400).json({ message: "Variants are required" });
+    }
+
+    const parsedVariants = JSON.parse(variants);
+
+    if (!Array.isArray(parsedVariants) || parsedVariants.length === 0) {
+      return res.status(400).json({ message: "At least one variant required" });
+    }
+
     const images = req.files.map(
-      (file) => `/uploads/products/${file.filename}`
+      (file) => `/uploads/products/${file.filename}`,
     );
 
     const product = await Product.create({
@@ -27,13 +44,18 @@ exports.addProduct = async (req, res) => {
       description,
       category,
       productType,
-      price,
-      mrp,
-      quantity: JSON.parse(quantity),
-      unit: JSON.parse(unit),
+      brandName,
+      taxPercent: Number(taxPercent) || 0,
+      variants: parsedVariants,
       images,
       thumbnail: images[0],
-      status: "active",
+      status,
+      isCODAvailable,
+      isSubstitutable,
+      isVegetarian,
+      isFragile,
+      isAgeRestricted,
+      keywords: keywords ? JSON.parse(keywords) : [],
     });
 
     res.status(201).json(product);
@@ -43,12 +65,10 @@ exports.addProduct = async (req, res) => {
   }
 };
 
-// ADMIN: update product
+/* ================= ADMIN: UPDATE PRODUCT ================= */
+
 exports.updateProduct = async (req, res) => {
   try {
-    console.log("UPDATE BODY:", req.body);
-    console.log("UPDATE FILES:", req.files);
-
     const product = await Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
@@ -59,43 +79,57 @@ exports.updateProduct = async (req, res) => {
       description,
       category,
       productType,
-      price,
-      mrp,
-      quantity,
-      unit,
+      taxPercent,
+      variants,
       status,
+      isCODAvailable,
+      isSubstitutable,
+      isVegetarian,
+      isFragile,
+      isAgeRestricted,
+      brandName,
+      keywords,
     } = req.body;
 
-    // basic fields
     if (name !== undefined) product.name = name;
     if (description !== undefined) product.description = description;
     if (category !== undefined) product.category = category;
     if (productType !== undefined) product.productType = productType;
-    if (price !== undefined) product.price = price;
-    if (mrp !== undefined) product.mrp = mrp;
+    if (brandName !== undefined) product.brandName = brandName;
+    if (taxPercent !== undefined) product.taxPercent = Number(taxPercent);
+
     if (status !== undefined) product.status = status;
+    if (isCODAvailable !== undefined) product.isCODAvailable = isCODAvailable;
+    if (isSubstitutable !== undefined)
+      product.isSubstitutable = isSubstitutable;
+    if (isVegetarian !== undefined) product.isVegetarian = isVegetarian;
+    if (isFragile !== undefined) product.isFragile = isFragile;
+    if (isAgeRestricted !== undefined)
+      product.isAgeRestricted = isAgeRestricted;
 
-    // ✅ SAFE parsing
-    if (quantity !== undefined) {
-      product.quantity = Array.isArray(quantity)
-        ? quantity
-        : JSON.parse(quantity);
+    if (keywords !== undefined) {
+      product.keywords = Array.isArray(keywords)
+        ? keywords
+        : JSON.parse(keywords);
     }
 
-    if (unit !== undefined) {
-      product.unit = Array.isArray(unit) ? unit : JSON.parse(unit);
+    if (variants !== undefined) {
+      product.variants = Array.isArray(variants)
+        ? variants
+        : JSON.parse(variants);
     }
 
-    // ✅ images only if uploaded
+    // Update images if provided
     if (req.files && req.files.length > 0) {
       const images = req.files.map(
-        (file) => `/uploads/products/${file.filename}`
+        (file) => `/uploads/products/${file.filename}`,
       );
       product.images = images;
       product.thumbnail = images[0];
     }
 
     await product.save();
+
     res.json(product);
   } catch (err) {
     console.error("UPDATE PRODUCT ERROR:", err);
@@ -106,19 +140,19 @@ exports.updateProduct = async (req, res) => {
   }
 };
 
-// ADMIN: get all products
+/* ================= ADMIN: GET ALL ================= */
+
 exports.getAdminProducts = async (req, res) => {
   try {
-    const products = await Product.find().populate("category"); // ✅ IMPORTANT
-
+    const products = await Product.find().populate("category");
     res.json(products);
   } catch (err) {
-    console.error("GET ADMIN PRODUCTS ERROR:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-// USER: get products
+/* ================= USER: GET ACTIVE ================= */
+
 exports.getProducts = async (req, res) => {
   try {
     const products = await Product.find({
@@ -134,11 +168,13 @@ exports.getProducts = async (req, res) => {
   }
 };
 
+/* ================= GROUP BY CATEGORY ================= */
+
 exports.getProductsByCategory = async (req, res) => {
   try {
-    const products = await Product.find({ status: "active" }).populate(
-      "category"
-    );
+    const products = await Product.find({
+      status: "active",
+    }).populate("category");
 
     const grouped = {};
 
@@ -159,7 +195,6 @@ exports.getProductsByCategory = async (req, res) => {
 
     res.json(Object.values(grouped));
   } catch (err) {
-    console.error("GROUP BY CATEGORY ERROR:", err);
     res.status(500).json({ message: err.message });
   }
 };
