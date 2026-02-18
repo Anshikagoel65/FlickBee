@@ -136,17 +136,21 @@ const productSchema = new mongoose.Schema(
 /* ===============================
    VIRTUALS
 ================================ */
-
 // Lowest price variant
 productSchema.virtual("minPrice").get(function () {
-  if (!this.variants.length) return 0;
-  return Math.min(...this.variants.map((v) => v.price));
+  if (!Array.isArray(this.variants) || this.variants.length === 0) {
+    return 0;
+  }
+  return Math.min(...this.variants.map((v) => v.price || 0));
 });
 
 // Overall availability
 productSchema.virtual("isAvailable").get(function () {
   if (this.status === "outOfStock") return false;
-  return this.variants.some((v) => v.stock > 0 && v.isAvailable);
+
+  if (!Array.isArray(this.variants)) return false;
+
+  return this.variants.some((v) => v && v.stock > 0 && v.isAvailable);
 });
 
 /* ===============================

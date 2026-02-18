@@ -30,11 +30,7 @@ const OrderRecommendations = () => {
         <div className="flex gap-1 min-w-max px-1">
           {products.map((product) => (
             <div key={product._id} className="flex-shrink-0 w-[280px]">
-              <div className="w-[1200px]">
-                <div className="w-[280px]">
-                  <ProductCard product={product} variant="carousel" />
-                </div>
-              </div>
+              <ProductCard product={product} variant="carousel" />
             </div>
           ))}
         </div>

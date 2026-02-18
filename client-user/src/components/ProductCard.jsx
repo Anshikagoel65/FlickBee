@@ -6,9 +6,11 @@ const API_BASE = process.env.REACT_APP_API_BASE;
 const ProductCard = ({ product, variant = "carousel" }) => {
   const navigate = useNavigate();
   const { cart, addToCart, removeFromCart } = useCart();
-
   const firstVariant = product.variants?.[0];
-
+  const hasStock = product.variants?.some(
+    (v) => Number(v.stock) > 0 && v.isAvailable !== false,
+  );
+  const isOutOfStock = !hasStock;
   const getQuantity = () => {
     if (!firstVariant) return 0;
     const key = `${product._id}_${firstVariant._id}`;
@@ -16,12 +18,6 @@ const ProductCard = ({ product, variant = "carousel" }) => {
   };
 
   const quantity = getQuantity();
-
-  const isOutOfStock =
-    !firstVariant ||
-    firstVariant.stock <= 0 ||
-    firstVariant.isAvailable === false;
-
   const discountPercent =
     firstVariant?.mrp > firstVariant?.price
       ? Math.round(
@@ -42,7 +38,7 @@ const ProductCard = ({ product, variant = "carousel" }) => {
 
       <div className="relative h-36 mb-2 flex items-center justify-center bg-gray-50 rounded-xl overflow-hidden z-0">
         <img
-          src={`${API_BASE}${product.images?.[0] || product.thumbnail}`}
+          src={`${API_BASE}${product.thumbnail}`}
           alt={product.name}
           className={`max-h-full max-w-full object-contain transition-all duration-200 ${
             isOutOfStock ? "opacity-40 grayscale" : ""

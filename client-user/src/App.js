@@ -31,12 +31,12 @@ function App() {
             <Route path="/category/:slug" element={<CategoryPage />} />
             <Route path="/product/:id" element={<ProductPage />} />
             <Route path="/search" element={<Search />} />
-            <Route path="/account" element={<Account />}>
+            <Route path="/account/*" element={<Account />}>
               <Route path="orders" element={<MyOrders />} />
               <Route path="addresses" element={<MyAddresses />} />
               <Route path="orders/:orderId" element={<OrderInvoice />} />
             </Route>
-            <Route path="/account/mobile" element={<AccountMobile />}>
+            <Route path="/account/mobile/*" element={<AccountMobile />}>
               <Route path="addresses" element={<MyAddresses />} />
             </Route>
           </Routes>

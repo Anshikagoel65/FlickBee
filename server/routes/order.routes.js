@@ -89,9 +89,7 @@ router.get("/recommendations", authMiddleware, async (req, res) => {
     const recommendations = await Product.find({
       _id: { $nin: Array.from(orderedProductIds) },
       status: "active",
-    })
-      .limit(10)
-      .select("name price mrp thumbnail images");
+    }).limit(10);
 
     res.json(recommendations);
   } catch (err) {
