@@ -24,6 +24,7 @@ const AddressDrawer = () => {
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [editAddress, setEditAddress] = useState(null);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("cod");
   const { cart, clearCart } = useCart();
   const navigate = useNavigate();
 
@@ -62,6 +63,11 @@ const AddressDrawer = () => {
       return;
     }
 
+    if (!selectedPaymentMethod) {
+      alert("Please select a payment method");
+      return;
+    }
+
     const items = Object.values(cart).map((item) => ({
       productId: item._id,
       name: item.name,
@@ -84,7 +90,12 @@ const AddressDrawer = () => {
       deliveryFee: deliveryCharge,
       discount: 0,
       grandTotal,
-      paymentMethod: "cod",
+      payment: {
+        method: selectedPaymentMethod,
+        status: selectedPaymentMethod === "cod" ? "pending" : "success",
+        amountPaid: grandTotal,
+        paidAt: selectedPaymentMethod !== "cod" ? new Date() : null,
+      },
     });
 
     clearCart();
@@ -168,6 +179,28 @@ const AddressDrawer = () => {
                 </button>
               </div>
             ))}
+          </div>
+          <div className="bg-white border-t p-4 space-y-3">
+            <p className="font-semibold text-sm text-gray-700">
+              Select Payment Method
+            </p>
+
+            <div className="space-y-2">
+              {["cod", "upi", "card"].map((method) => (
+                <label
+                  key={method}
+                  className="flex items-center gap-3 cursor-pointer border rounded-lg p-3"
+                >
+                  <input
+                    type="radio"
+                    value={method}
+                    checked={selectedPaymentMethod === method}
+                    onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+                  />
+                  <span className="capitalize">{method}</span>
+                </label>
+              ))}
+            </div>
           </div>
           {selectedAddressId && (
             <div className="bg-white border-t p-4 shrink-0">

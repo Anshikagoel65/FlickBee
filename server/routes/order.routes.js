@@ -14,8 +14,14 @@ router.post("/", authMiddleware, async (req, res) => {
       deliveryFee,
       discount,
       grandTotal,
-      paymentMethod,
+      payment,
     } = req.body;
+
+    if (!payment || !payment.method) {
+      return res.status(400).json({
+        message: "Payment method is required",
+      });
+    }
 
     const order = await Order.create({
       userId: req.user._id,
@@ -30,9 +36,15 @@ router.post("/", authMiddleware, async (req, res) => {
       grandTotal,
 
       payment: {
-        method: paymentMethod,
-        status: paymentMethod === "cod" ? "pending" : "success",
-        amountPaid: grandTotal,
+        method: payment.method,
+        status:
+          payment.status || (payment.method === "cod" ? "pending" : "success"),
+        transactionId: payment.transactionId || null,
+        amountPaid: payment.amountPaid || grandTotal,
+        paidAt:
+          payment.method !== "cod" && payment.status === "success"
+            ? new Date()
+            : null,
       },
 
       delivery: {},
@@ -47,9 +59,13 @@ router.post("/", authMiddleware, async (req, res) => {
     });
 
     res.status(201).json(order);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Order creation failed" });
+  } catch (error) {
+    console.error("ORDER ERROR:", error);
+
+    res.status(500).json({
+      message: "Order creation failed",
+      error: error.message,
+    });
   }
 });
 
