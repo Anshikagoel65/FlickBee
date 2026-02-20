@@ -21,7 +21,15 @@ const CartDrawer = ({ isOpen, onClose }) => {
     (sum, item) => sum + item.price * item.cartQty,
     0,
   );
+  const mrpTotal = cartItems.reduce(
+    (sum, item) =>
+      sum +
+      (item.mrp && item.mrp > item.price ? item.mrp : item.price) *
+        item.cartQty,
+    0,
+  );
 
+  const totalSavings = mrpTotal - itemsTotal;
   const DELIVERY_THRESHOLD = 100;
   const DELIVERY_CHARGE = 25;
   const handlingCharge = 2;
@@ -76,7 +84,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
               <div className="mt-4 space-y-4">
                 {cartItems.map((item) => (
-                  <CartItemRow key={item.id} item={item} />
+                  <CartItemRow key={item.id} item={item} onClose={onClose} />
                 ))}
               </div>
             </div>
@@ -84,6 +92,8 @@ const CartDrawer = ({ isOpen, onClose }) => {
           <div className="px-4">
             <BillDetails
               itemsTotal={itemsTotal}
+              mrpTotal={mrpTotal}
+              totalSavings={totalSavings}
               deliveryCharge={deliveryCharge}
               isFreeDelivery={isFreeDelivery}
               handlingCharge={handlingCharge}

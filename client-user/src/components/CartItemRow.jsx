@@ -1,17 +1,37 @@
 import { useCart } from "../context/CartContext";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
 
-const CartItemRow = ({ item }) => {
-  const { addToCart, removeFromCart } = useCart();
+const CartItemRow = ({ item, onClose }) => {
+  const navigate = useNavigate();
+  const { increaseCartQty, removeFromCart } = useCart();
   const imagePath = item.thumbnail || item.images?.[0];
   const imageUrl = imagePath
     ? `${API_BASE.replace(/\/$/, "")}/${imagePath.replace(/^\//, "")}`
     : "";
 
+  const handleAdd = () => {
+    console.log("PLUS CLICKED:", item);
+    increaseCartQty(item.id);
+  };
+
+  const handleRemove = () => {
+    console.log("MINUS CLICKED:", item);
+    removeFromCart(item);
+  };
+
+  const handleProductClick = () => {
+    onClose();
+    navigate(`/product/${item.productId}?variant=${item.variantId}`);
+  };
+
   return (
     <div className="flex items-center justify-between">
-      <div className="flex items-center gap-3">
+      <div
+        onClick={handleProductClick}
+        className="flex items-center gap-3 cursor-pointer"
+      >
         <div className="w-14 h-14 rounded-lg overflow-hidden">
           <img
             src={imageUrl}
@@ -29,7 +49,7 @@ const CartItemRow = ({ item }) => {
 
       <div className="flex items-center bg-green-700 text-white rounded-lg">
         <button
-          onClick={() => removeFromCart(item)}
+          onClick={handleRemove}
           className="
             px-2 py-1 text-sm
             sm:px-3 sm:text-lg
@@ -46,11 +66,11 @@ const CartItemRow = ({ item }) => {
             font-semibold
           "
         >
-          {item.cartQty}
+          {item.cartQty ?? 0}
         </span>
 
         <button
-          onClick={() => addToCart(item)}
+          onClick={handleAdd}
           className="
             px-2 py-1 text-sm
             sm:px-3 sm:text-lg

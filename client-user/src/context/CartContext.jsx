@@ -69,9 +69,24 @@ export const CartProvider = ({ children }) => {
     localStorage.removeItem("cart");
   };
 
+  const increaseCartQty = (itemId) => {
+    setCart((prev) => {
+      const existing = prev[itemId];
+      if (!existing) return prev;
+
+      return {
+        ...prev,
+        [itemId]: {
+          ...existing,
+          cartQty: existing.cartQty + 1,
+        },
+      };
+    });
+  };
+
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, clearCart }}
+      value={{ cart, addToCart, removeFromCart, increaseCartQty, clearCart }}
     >
       {children}
     </CartContext.Provider>
