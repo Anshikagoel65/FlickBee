@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import API from "../api/axios";
 import toast from "react-hot-toast";
+import { useOrderNotification } from "../context/OrderNotificationContext";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const { newOrdersCount } = useOrderNotification();
 
   const fetchOrders = async () => {
     try {
@@ -17,10 +19,13 @@ const Orders = () => {
 
   useEffect(() => {
     fetchOrders();
-    const interval = setInterval(fetchOrders, 10000); // every 10 sec
-
-    return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (newOrdersCount > 0) {
+      fetchOrders();
+    }
+  }, [newOrdersCount]);
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -82,7 +87,7 @@ const Orders = () => {
 
           <tbody>
             {orders.map((order) => (
-              <tr key={order._id}>
+              <tr key={order._id} className="transition">
                 <td className="p-3 border">
                   <div>
                     <p className="font-medium">{order.addressId?.name}</p>
@@ -101,7 +106,6 @@ const Orders = () => {
 
                 <td className="p-3 border">
                   <div className="flex flex-col gap-1">
-                    {/* Payment Badge */}
                     <span
                       className={`px-2 py-1 text-xs rounded-full font-medium w-fit ${getPaymentStyle(
                         order.payment?.status,
@@ -110,7 +114,6 @@ const Orders = () => {
                       {order.payment?.status}
                     </span>
 
-                    {/* Dropdown */}
                     <select
                       value={order.payment?.status}
                       disabled={order.payment?.status === "refunded"}
@@ -154,7 +157,6 @@ const Orders = () => {
 
                 <td className="p-3 border">
                   <div className="flex items-center gap-2">
-                    {/* Status Badge */}
                     <span
                       className={`px-2 py-1 text-xs rounded-full font-medium ${getStatusStyle(
                         order.currentStatus,
@@ -163,7 +165,6 @@ const Orders = () => {
                       {order.currentStatus}
                     </span>
 
-                    {/* Dropdown */}
                     <select
                       value={order.currentStatus}
                       disabled={
@@ -184,7 +185,10 @@ const Orders = () => {
                           setOrders((prev) =>
                             prev.map((o) =>
                               o._id === order._id
-                                ? { ...o, currentStatus: newStatus }
+                                ? {
+                                    ...o,
+                                    currentStatus: newStatus,
+                                  }
                                 : o,
                             ),
                           );
@@ -225,7 +229,6 @@ const Orders = () => {
         </table>
       </div>
 
-      {/* ORDER DETAILS MODAL */}
       {selectedOrder && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
           <div className="bg-white w-3/4 max-h-[90vh] overflow-y-auto p-6 rounded">

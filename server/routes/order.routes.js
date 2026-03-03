@@ -58,6 +58,13 @@ router.post("/", authMiddleware, async (req, res) => {
       ],
     });
 
+    if (global.io) {
+      global.io.emit("new-order", {
+        orderId: order._id,
+        total: order.grandTotal,
+        userId: order.userId,
+      });
+    }
     res.status(201).json(order);
   } catch (error) {
     console.error("ORDER ERROR:", error);
@@ -83,16 +90,12 @@ router.get("/recommendations", authMiddleware, async (req, res) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    // 1️⃣ Fetch user orders
     const orders = await Order.find({ userId: req.user._id });
-
     if (!orders.length) {
       return res.json([]);
     }
 
-    // 2️⃣ Collect ordered product IDs
     const orderedProductIds = new Set();
-
     orders.forEach((order) => {
       order.items.forEach((item) => {
         if (item.productId) {
@@ -101,12 +104,10 @@ router.get("/recommendations", authMiddleware, async (req, res) => {
       });
     });
 
-    // 3️⃣ Fetch products not already ordered
     const recommendations = await Product.find({
       _id: { $nin: Array.from(orderedProductIds) },
       status: "active",
     }).limit(10);
-
     res.json(recommendations);
   } catch (err) {
     console.error("RECOMMENDATION ERROR:", err);

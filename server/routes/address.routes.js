@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Address = require("../models/Address");
-const auth = require("../middleware/authMiddleware"); // JWT middleware
+const auth = require("../middleware/authMiddleware");
 
-// ➕ ADD ADDRESS
 router.post("/", auth, async (req, res) => {
   try {
     const {
@@ -23,7 +22,6 @@ router.post("/", auth, async (req, res) => {
       isDefault,
     } = req.body;
 
-    // Ensure only one default address
     if (isDefault) {
       await Address.updateMany({ userId: req.user._id }, { isDefault: false });
     }
@@ -60,7 +58,6 @@ router.post("/", auth, async (req, res) => {
   }
 });
 
-// 📥 GET ADDRESSES
 router.get("/", auth, async (req, res) => {
   try {
     const addresses = await Address.find({
@@ -74,7 +71,6 @@ router.get("/", auth, async (req, res) => {
   }
 });
 
-// ✏️ UPDATE
 router.put("/:id", auth, async (req, res) => {
   try {
     const {
@@ -125,7 +121,6 @@ router.put("/:id", auth, async (req, res) => {
   }
 });
 
-// ❌ DELETE
 router.delete("/:id", auth, async (req, res) => {
   try {
     await Address.findOneAndDelete({

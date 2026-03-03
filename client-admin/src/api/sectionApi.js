@@ -1,12 +1,10 @@
-import axios from "axios";
+import API from "./axios";
 
-const API = "http://localhost:5000/api/admin";
+export const fetchSections = () => API.get("/admin/sections");
 
-export const fetchSections = () => axios.get(`${API}/sections`);
-
-export const createSection = (data) => axios.post(`${API}/sections`, data);
+export const createSection = (data) => API.post("/admin/sections", data);
 
 export const updateSection = (id, data) =>
-  axios.put(`${API}/sections/${id}`, data);
+  API.put(`/admin/sections/${id}`, data);
 
-export const deleteSection = (id) => axios.delete(`${API}/sections/${id}`);
+export const deleteSection = (id) => API.delete(`/admin/sections/${id}`);

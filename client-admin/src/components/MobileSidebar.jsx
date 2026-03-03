@@ -1,4 +1,15 @@
-import { X, LayoutDashboard, Image, Grid, Layers, Package } from "lucide-react";
+import {
+  X,
+  LayoutDashboard,
+  Image,
+  Grid,
+  Layers,
+  Package,
+  BarChart,
+  ShoppingBag,
+  UsersIcon,
+  KeyRound,
+} from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const linkBase =
@@ -34,6 +45,17 @@ const MobileSidebar = ({ onClose }) => {
           >
             <LayoutDashboard size={18} />
             Dashboard
+          </NavLink>
+
+          <NavLink
+            to="/analytics"
+            onClick={onClose}
+            className={({ isActive }) =>
+              `${linkBase} ${isActive ? active : ""}`
+            }
+          >
+            <BarChart size={18} />
+            Analytics
           </NavLink>
 
           <NavLink
@@ -78,6 +100,39 @@ const MobileSidebar = ({ onClose }) => {
           >
             <Layers size={18} />
             Sections
+          </NavLink>
+
+          <NavLink
+            to="/users"
+            onClick={onClose}
+            className={({ isActive }) =>
+              `${linkBase} ${isActive ? active : ""}`
+            }
+          >
+            <UsersIcon size={18} />
+            Users
+          </NavLink>
+
+          <NavLink
+            to="/orders"
+            onClick={onClose}
+            className={({ isActive }) =>
+              `${linkBase} ${isActive ? active : ""}`
+            }
+          >
+            <ShoppingBag size={18} />
+            Orders
+          </NavLink>
+
+          <NavLink
+            to="/change-password"
+            onClick={onClose}
+            className={({ isActive }) =>
+              `${linkBase} ${isActive ? active : ""}`
+            }
+          >
+            <KeyRound size={18} />
+            Change Password
           </NavLink>
         </nav>
       </aside>

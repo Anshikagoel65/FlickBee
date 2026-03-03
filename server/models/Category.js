@@ -6,22 +6,22 @@ const categorySchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      unique: true, // "Biscuits & Cookies"
+      unique: true,
     },
 
     slug: {
       type: String,
       required: true,
-      unique: true, // biscuits-cookies
+      unique: true,
     },
 
     image: {
-      type: String, // category image URL
+      type: String,
       required: true,
     },
 
     order: {
-      type: Number, // for sorting on UI
+      type: Number,
       default: 0,
     },
 
@@ -30,7 +30,7 @@ const categorySchema = new mongoose.Schema(
       default: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Category", categorySchema);

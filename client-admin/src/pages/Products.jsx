@@ -54,8 +54,8 @@ const Products = () => {
       ]);
 
       setCategories(catRes.data || []);
-      setProducts(prodRes.data || []);
-      setAllProducts(prodRes.data || []);
+      setProducts(prodRes || []);
+      setAllProducts(prodRes || []);
     };
 
     init();
@@ -166,8 +166,8 @@ const Products = () => {
 
       resetForm();
       const res = await getProducts();
-      setProducts(res.data || []);
-      setAllProducts(res.data || []);
+      setProducts(res || []);
+      setAllProducts(res || []);
     } catch (err) {
       console.error("Save failed", err);
     }
@@ -200,8 +200,8 @@ const Products = () => {
     if (!window.confirm("Delete this product?")) return;
     await deleteProduct(id);
     const res = await getProducts();
-    setProducts(res.data || []);
-    setAllProducts(res.data || []);
+    setProducts(res || []);
+    setAllProducts(res || []);
   };
 
   /* ================= SEARCH ================= */

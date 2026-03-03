@@ -13,11 +13,6 @@ const PRODUCT_TYPES = [
 
 const UNIT_TYPES = ["gram", "kg", "ml", "liter", "piece"];
 const PRODUCT_STATUS = ["active", "inactive", "outOfStock"];
-
-/* ===============================
-   STORE VARIANT INFO
-================================ */
-
 const storeVariantSchema = new mongoose.Schema(
   {
     stock: { type: Number, default: 0, min: 0 },
@@ -27,10 +22,6 @@ const storeVariantSchema = new mongoose.Schema(
   { _id: false },
 );
 
-/* ===============================
-   VARIANT SCHEMA
-================================ */
-
 const variantSchema = new mongoose.Schema(
   {
     quantity: { type: Number, required: true },
@@ -39,7 +30,7 @@ const variantSchema = new mongoose.Schema(
     price: { type: Number, required: true, min: 0 },
     mrp: { type: Number, required: true, min: 0 },
 
-    sku: { type: String }, // optional
+    sku: { type: String },
 
     stock: { type: Number, default: 0, min: 0 },
     isAvailable: { type: Boolean, default: true },
@@ -53,20 +44,12 @@ const variantSchema = new mongoose.Schema(
   { _id: true },
 );
 
-/* ===============================
-   MAIN PRODUCT SCHEMA
-================================ */
-
 const productSchema = new mongoose.Schema(
   {
-    /* BASIC INFO */
     name: { type: String, required: true, trim: true },
     description: { type: String, required: true },
     brandName: { type: String, default: "FlickBee" },
-
     keywords: { type: [String], default: [], index: true },
-
-    /* CATEGORY */
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
@@ -81,10 +64,8 @@ const productSchema = new mongoose.Schema(
       index: true,
     },
 
-    /* TAX */
     taxPercent: { type: Number, default: 0, min: 0 },
 
-    /* VARIANTS */
     variants: {
       type: [variantSchema],
       validate: {
@@ -93,11 +74,9 @@ const productSchema = new mongoose.Schema(
       },
     },
 
-    /* OPTIONAL DETAILS */
     highlights: { type: Map, of: String },
     keyDetails: { type: Map, of: String },
 
-    /* MEDIA */
     images: {
       type: [String],
       required: true,
@@ -106,7 +85,6 @@ const productSchema = new mongoose.Schema(
 
     thumbnail: { type: String },
 
-    /* PRODUCT STATUS */
     status: {
       type: String,
       enum: PRODUCT_STATUS,
@@ -117,12 +95,10 @@ const productSchema = new mongoose.Schema(
     isCODAvailable: { type: Boolean, default: true },
     isSubstitutable: { type: Boolean, default: true },
 
-    /* COMPLIANCE */
     isVegetarian: { type: Boolean, default: true },
     isFragile: { type: Boolean, default: false },
     isAgeRestricted: { type: Boolean, default: false },
 
-    /* RATINGS */
     averageRating: { type: Number, default: 0, min: 0, max: 5 },
     ratingCount: { type: Number, default: 0, min: 0 },
   },
@@ -133,10 +109,6 @@ const productSchema = new mongoose.Schema(
   },
 );
 
-/* ===============================
-   VIRTUALS
-================================ */
-// Lowest price variant
 productSchema.virtual("minPrice").get(function () {
   if (!Array.isArray(this.variants) || this.variants.length === 0) {
     return 0;
@@ -144,7 +116,6 @@ productSchema.virtual("minPrice").get(function () {
   return Math.min(...this.variants.map((v) => v.price || 0));
 });
 
-// Overall availability
 productSchema.virtual("isAvailable").get(function () {
   if (this.status === "outOfStock") return false;
 
@@ -153,19 +124,11 @@ productSchema.virtual("isAvailable").get(function () {
   return this.variants.some((v) => v && v.stock > 0 && v.isAvailable);
 });
 
-/* ===============================
-   MIDDLEWARE
-================================ */
-
 productSchema.pre("save", function () {
   if (!this.thumbnail && this.images.length > 0) {
     this.thumbnail = this.images[0];
   }
 });
-
-/* ===============================
-   INDEXES
-================================ */
 
 productSchema.index({ name: "text", keywords: "text" });
 productSchema.index({ category: 1, productType: 1 });

@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const http = require("http");
+const { Server } = require("socket.io");
 require("dotenv").config();
 
 const connectDB = require("./config/db");
@@ -10,10 +12,10 @@ const userRoutes = require("./routes/user.routes");
 const authRoutes = require("./routes/auth");
 const addressRoutes = require("./routes/address.routes");
 const orderRoutes = require("./routes/order.routes");
+const bannerRoutes = require("./routes/banner.routes");
 
 const app = express();
 
-/* 🔥 STATIC FIRST */
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const allowedOrigins = [
@@ -45,12 +47,26 @@ app.use("/api/auth", authRoutes);
 app.use("/api/address", addressRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api", userRoutes);
+app.use("/api/banners", bannerRoutes);
 
-/* DB */
 connectDB();
 
-/* SERVER */
 const PORT = 5000;
-app.listen(PORT, () => {
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    credentials: true,
+  },
+});
+
+global.io = io;
+
+io.on("connection", (socket) => {
+  console.log("Client connected:", socket.id);
+});
+
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

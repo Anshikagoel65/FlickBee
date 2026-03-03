@@ -1,7 +1,5 @@
 const Product = require("../models/Product");
 
-/* ================= ADMIN: ADD PRODUCT ================= */
-
 exports.addProduct = async (req, res) => {
   try {
     const {
@@ -65,8 +63,6 @@ exports.addProduct = async (req, res) => {
   }
 };
 
-/* ================= ADMIN: UPDATE PRODUCT ================= */
-
 exports.updateProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -119,7 +115,6 @@ exports.updateProduct = async (req, res) => {
         : JSON.parse(variants);
     }
 
-    // Update images if provided
     if (req.files && req.files.length > 0) {
       const images = req.files.map(
         (file) => `/uploads/products/${file.filename}`,
@@ -140,8 +135,6 @@ exports.updateProduct = async (req, res) => {
   }
 };
 
-/* ================= ADMIN: GET ALL ================= */
-
 exports.getAdminProducts = async (req, res) => {
   try {
     const products = await Product.find().populate("category");
@@ -150,8 +143,6 @@ exports.getAdminProducts = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
-/* ================= USER: GET ACTIVE ================= */
 
 exports.getProducts = async (req, res) => {
   try {
@@ -167,8 +158,6 @@ exports.getProducts = async (req, res) => {
     });
   }
 };
-
-/* ================= GROUP BY CATEGORY ================= */
 
 exports.getProductsByCategory = async (req, res) => {
   try {

@@ -6,10 +6,10 @@ import "./index.css";
 import App from "./App.jsx";
 
 createRoot(document.getElementById("root")).render(
-  <OrderNotificationProvider>
-    <StrictMode>
-      <Toaster position="top-right" />
+  <StrictMode>
+    <Toaster position="top-right" />
+    <OrderNotificationProvider>
       <App />
-    </StrictMode>
-  </OrderNotificationProvider>,
+    </OrderNotificationProvider>
+  </StrictMode>,
 );

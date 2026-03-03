@@ -1,40 +1,62 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import publicAPI from "../api/publicAxios";
+import { io } from "socket.io-client";
 import toast from "react-hot-toast";
 
 const OrderNotificationContext = createContext();
 
 export const OrderNotificationProvider = ({ children }) => {
-  const [hasNewOrder, setHasNewOrder] = useState(false);
-
-  const previousCount = useRef(0);
-  const isFirstLoad = useRef(true);
-
-  const checkForNewOrders = async () => {
-    try {
-      const res = await publicAPI.get("/admin/orders-count");
-      const currentCount = res.data.count;
-      if (isFirstLoad.current) {
-        previousCount.current = currentCount;
-        isFirstLoad.current = false;
-      } else if (currentCount > previousCount.current) {
-        toast.success("🛒 New order received!");
-        setHasNewOrder(true);
-        previousCount.current = currentCount;
-      }
-    } catch (err) {
-      console.log("Polling error FULL:", err.response?.data || err);
-    }
-  };
+  const [newOrdersCount, setNewOrdersCount] = useState(0);
+  const audioRef = useRef(null);
 
   useEffect(() => {
-    checkForNewOrders();
-    const interval = setInterval(checkForNewOrders, 10000); // 10 sec
-    return () => clearInterval(interval);
+    // 🔔 Create and preload audio
+    audioRef.current = new Audio("/notification.mp3");
+    audioRef.current.preload = "auto";
+    audioRef.current.volume = 1;
+
+    // 🔓 Unlock audio on first user interaction (VERY IMPORTANT)
+    const unlockAudio = () => {
+      if (audioRef.current) {
+        audioRef.current
+          .play()
+          .then(() => {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+          })
+          .catch(() => {});
+      }
+      window.removeEventListener("click", unlockAudio);
+    };
+
+    window.addEventListener("click", unlockAudio);
+
+    const socket = io("http://localhost:5000", {
+      transports: ["websocket"],
+    });
+
+    socket.on("new-order", (data) => {
+      setNewOrdersCount((prev) => prev + 1);
+
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch((err) => {
+          console.log("Audio blocked:", err);
+        });
+      }
+
+      toast.success(`🛒 New Order ₹${data.total} received`);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   return (
-    <OrderNotificationContext.Provider value={{ hasNewOrder, setHasNewOrder }}>
+    <OrderNotificationContext.Provider
+      value={{ newOrdersCount, setNewOrdersCount }}
+    >
       {children}
     </OrderNotificationContext.Provider>
   );

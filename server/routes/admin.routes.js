@@ -30,11 +30,9 @@ router.use(
     credentials: true,
   }),
 );
-// ADMIN LOGIN ROUTE
+
 router.post("/login", adminLogin);
 router.put("/change-password", authMiddleware, adminMiddleware, changePassword);
-
-/* ================= CATEGORIES ================= */
 
 router.post(
   "/categories",
@@ -80,8 +78,6 @@ router.delete(
   },
 );
 
-/* ================= PRODUCTS ================= */
-
 router.post(
   "/products",
   authMiddleware,
@@ -109,8 +105,6 @@ router.delete(
     res.json({ success: true });
   },
 );
-
-/* ================= SECTIONS ================= */
 
 router.get("/sections", authMiddleware, adminMiddleware, async (req, res) => {
   const sections = await Section.find()

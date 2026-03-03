@@ -20,7 +20,6 @@ const sectionSchema = new mongoose.Schema(
       },
     ],
 
-    // ✅ ADD THESE
     isActive: {
       type: Boolean,
       default: true,
@@ -31,7 +30,7 @@ const sectionSchema = new mongoose.Schema(
       default: 0,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Section", sectionSchema);

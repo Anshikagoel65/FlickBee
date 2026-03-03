@@ -1,17 +1,10 @@
-import axios from "axios";
-
-/* ================= BASE CONFIG ================= */
-
-// Use environment variable in production
-const API_BASE = "http://localhost:5000/api";
-
-const ADMIN_BASE = `${API_BASE}/admin/products`;
+import API from "./axios";
 
 /* ================= CREATE ================= */
 
 export const createProduct = async (formData) => {
   try {
-    const res = await axios.post(ADMIN_BASE, formData, {
+    const res = await API.post("/admin/products", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -34,11 +27,11 @@ export const getProducts = async (filters = {}) => {
     if (filters.status) params.append("status", filters.status);
     if (filters.search) params.append("search", filters.search);
 
-    const res = await axios.get(
-      `${ADMIN_BASE}${params.toString() ? `?${params}` : ""}`,
+    const res = await API.get(
+      `/admin/products${params.toString() ? `?${params}` : ""}`,
     );
 
-    return res;
+    return res.data;
   } catch (error) {
     console.error("Get Products API Error:", error);
     throw error.response?.data || error;
@@ -49,7 +42,7 @@ export const getProducts = async (filters = {}) => {
 
 export const updateProduct = async (id, formData) => {
   try {
-    const res = await axios.put(`${ADMIN_BASE}/${id}`, formData, {
+    const res = await API.put(`/admin/products/${id}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -66,7 +59,7 @@ export const updateProduct = async (id, formData) => {
 
 export const deleteProduct = async (id) => {
   try {
-    const res = await axios.delete(`${ADMIN_BASE}/${id}`);
+    const res = await API.delete(`/admin/products/${id}`);
     return res.data;
   } catch (error) {
     console.error("Delete Product API Error:", error);

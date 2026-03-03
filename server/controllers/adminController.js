@@ -5,10 +5,9 @@ const Address = require("../models/Address");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// ADMIN LOGIN
 exports.changePassword = async (req, res) => {
   try {
-    const adminId = req.user.id; // from middleware
+    const adminId = req.user.id;
     const { oldPassword, newPassword } = req.body;
 
     if (!oldPassword || !newPassword) {
@@ -79,7 +78,6 @@ exports.adminLogin = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.aggregate([
-      // Join orders
       {
         $lookup: {
           from: "orders",
@@ -88,16 +86,12 @@ exports.getAllUsers = async (req, res) => {
           as: "orders",
         },
       },
-
-      // Calculate totals
       {
         $addFields: {
           totalOrders: { $size: "$orders" },
           totalSpent: { $sum: "$orders.grandTotal" },
         },
       },
-
-      // Select fields
       {
         $project: {
           phone: 1,
@@ -141,19 +135,13 @@ exports.updateOrderStatus = async (req, res) => {
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
-
-    // Update current status
     order.currentStatus = status;
-
-    // Push into status timeline
     order.statusTimeline.push({
       status,
       time: new Date(),
       note: "Updated by admin",
     });
-
     await order.save();
-
     res.json({ message: "Status updated successfully", order });
   } catch (error) {
     console.error(error);
@@ -165,25 +153,18 @@ exports.updatePaymentStatus = async (req, res) => {
   try {
     const { status } = req.body;
     const orderId = req.params.id;
-
     const order = await Order.findById(orderId);
-
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // Update payment status
     order.payment.status = status;
-
-    // Push to timeline
     order.statusTimeline.push({
       status: `payment-${status}`,
       time: new Date(),
       note: "Payment updated by admin",
     });
-
     await order.save();
-
     res.json({ message: "Payment status updated", order });
   } catch (error) {
     console.error(error);
