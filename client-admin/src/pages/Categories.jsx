@@ -7,7 +7,7 @@ import {
   updateCategory,
 } from "../api/categoryApi";
 
-/* 🔹 helper: generate slug */
+const BASE_URL = import.meta.env.VITE_SOCKET_URL;
 const generateSlug = (text) =>
   text
     .toLowerCase()
@@ -17,17 +17,14 @@ const generateSlug = (text) =>
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
-
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
-
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [order, setOrder] = useState(0);
   const [imageFile, setImageFile] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  /* ✅ LOAD CATEGORIES */
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -41,7 +38,6 @@ const Categories = () => {
     fetchData();
   }, []);
 
-  /* 🔹 image upload */
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -50,7 +46,6 @@ const Categories = () => {
     setPreview(URL.createObjectURL(file));
   };
 
-  /* 🔹 save category */
   const saveCategory = async () => {
     if (!name || !slug) return;
 
@@ -58,7 +53,6 @@ const Categories = () => {
     formData.append("name", name);
     formData.append("slug", slug);
     formData.append("order", order);
-
     if (imageFile) {
       formData.append("image", imageFile);
     }
@@ -79,18 +73,16 @@ const Categories = () => {
     }
   };
 
-  /* 🔹 edit */
   const editCategory = (cat) => {
     setName(cat.name);
     setSlug(cat.slug);
     setOrder(cat.order || 0);
-    setPreview(cat.image ? `http://localhost:5000${cat.image}` : null);
+    setPreview(cat.image ? `${BASE_URL}${cat.image}` : null);
     setImageFile(null);
     setEditingId(cat._id);
     setShowForm(true);
   };
 
-  /* 🔹 delete */
   const deleteCategory = async (id) => {
     if (!window.confirm("Delete this category?")) return;
 
@@ -103,7 +95,6 @@ const Categories = () => {
     }
   };
 
-  /* 🔹 reset */
   const resetForm = () => {
     setName("");
     setSlug("");
@@ -116,7 +107,6 @@ const Categories = () => {
 
   return (
     <div>
-      {/* HEADER */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Categories</h1>
         <button
@@ -127,8 +117,6 @@ const Categories = () => {
           Add Category
         </button>
       </div>
-
-      {/* FORM */}
       {showForm && (
         <div className="bg-white p-4 rounded-xl shadow mb-6">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -196,7 +184,6 @@ const Categories = () => {
         </div>
       )}
 
-      {/* GRID */}
       {categories.length === 0 ? (
         <p className="text-gray-500">No categories added yet.</p>
       ) : (
@@ -208,7 +195,7 @@ const Categories = () => {
               <div key={cat._id} className="bg-white rounded-xl shadow p-3">
                 {cat.image && (
                   <img
-                    src={`http://localhost:5000${cat.image}`}
+                    src={`${BASE_URL}${cat.image}`}
                     alt={cat.name}
                     className="h-32 w-full object-cover rounded-lg"
                   />

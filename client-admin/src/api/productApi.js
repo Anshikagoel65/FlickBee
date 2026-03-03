@@ -1,7 +1,5 @@
 import API from "./axios";
 
-/* ================= CREATE ================= */
-
 export const createProduct = async (formData) => {
   try {
     const res = await API.post("/admin/products", formData, {
@@ -16,8 +14,6 @@ export const createProduct = async (formData) => {
     throw error.response?.data || error;
   }
 };
-
-/* ================= GET (ADMIN) ================= */
 
 export const getProducts = async (filters = {}) => {
   try {
@@ -38,8 +34,6 @@ export const getProducts = async (filters = {}) => {
   }
 };
 
-/* ================= UPDATE ================= */
-
 export const updateProduct = async (id, formData) => {
   try {
     const res = await API.put(`/admin/products/${id}`, formData, {
@@ -54,8 +48,6 @@ export const updateProduct = async (id, formData) => {
     throw error.response?.data || error;
   }
 };
-
-/* ================= DELETE ================= */
 
 export const deleteProduct = async (id) => {
   try {

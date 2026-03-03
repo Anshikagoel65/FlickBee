@@ -12,15 +12,12 @@ const Sections = () => {
   const [sections, setSections] = useState([]);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
-
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [selectedProducts, setSelectedProducts] = useState([]);
-
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
-  /* ================= LOAD INITIAL DATA ================= */
   useEffect(() => {
     loadInitialData();
   }, []);
@@ -29,8 +26,6 @@ const Sections = () => {
     try {
       const secRes = await fetchSections();
       const catRes = await fetchCategories();
-
-      // 🔥 FIX: use .data safely
       setSections(secRes?.data || []);
       setCategories(catRes?.data || []);
     } catch (err) {
@@ -38,16 +33,13 @@ const Sections = () => {
     }
   };
 
-  /* ================= LOAD PRODUCTS BY CATEGORY ================= */
   const loadProductsByCategory = async (categoryId) => {
     if (!categoryId) return;
 
     try {
       setLoadingProducts(true);
-      const prodRes = await getProducts(categoryId);
-
-      // 🔥 FIX: API returns { data }
-      setProducts(prodRes?.data || []);
+      const prodRes = await getProducts({ category: categoryId });
+      setProducts(prodRes || []);
     } catch (err) {
       console.error("Failed to load products", err);
       setProducts([]);
@@ -56,14 +48,12 @@ const Sections = () => {
     }
   };
 
-  /* ================= TOGGLE PRODUCT ================= */
   const toggleProduct = (id) => {
     setSelectedProducts((prev) =>
-      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
     );
   };
 
-  /* ================= SAVE SECTION ================= */
   const saveSection = async () => {
     if (!title.trim()) {
       alert("Enter section title");
@@ -103,7 +93,6 @@ const Sections = () => {
     }
   };
 
-  /* ================= RESET FORM ================= */
   const resetForm = () => {
     setEditingId(null);
     setTitle("");
@@ -112,13 +101,12 @@ const Sections = () => {
     setSelectedProducts([]);
   };
 
-  /* ================= DELETE SECTION ================= */
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this section?")) return;
 
     try {
       await deleteSection(id);
-      loadInitialData(); // 🔥 FIX: refresh UI
+      loadInitialData();
     } catch (err) {
       console.error("Delete failed", err);
     }
@@ -128,19 +116,13 @@ const Sections = () => {
     setEditingId(section._id);
     setTitle(section.title);
     setCategory(section.category._id);
-
-    // load products of this category
     loadProductsByCategory(section.category._id);
-
-    // pre-select products
     setSelectedProducts(section.products.map((p) => p._id));
   };
 
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-6">Sections</h1>
-
-      {/* ================= CREATE FORM ================= */}
       <div className="bg-white p-4 rounded-xl mb-8 shadow">
         <input
           placeholder="Section title"
@@ -167,7 +149,6 @@ const Sections = () => {
           ))}
         </select>
 
-        {/* ================= PRODUCTS ================= */}
         {loadingProducts && (
           <p className="text-sm text-gray-500">Loading products…</p>
         )}
@@ -205,8 +186,6 @@ const Sections = () => {
           Save Section
         </button>
       </div>
-
-      {/* ================= SECTION LIST ================= */}
       <div className="grid gap-4">
         {sections.length === 0 ? (
           <p className="text-gray-500">No sections created yet.</p>

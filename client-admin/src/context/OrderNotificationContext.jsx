@@ -7,14 +7,12 @@ const OrderNotificationContext = createContext();
 export const OrderNotificationProvider = ({ children }) => {
   const [newOrdersCount, setNewOrdersCount] = useState(0);
   const audioRef = useRef(null);
+  const socketRef = useRef(null);
 
   useEffect(() => {
-    // 🔔 Create and preload audio
     audioRef.current = new Audio("/notification.mp3");
     audioRef.current.preload = "auto";
     audioRef.current.volume = 1;
-
-    // 🔓 Unlock audio on first user interaction (VERY IMPORTANT)
     const unlockAudio = () => {
       if (audioRef.current) {
         audioRef.current
@@ -29,14 +27,16 @@ export const OrderNotificationProvider = ({ children }) => {
     };
 
     window.addEventListener("click", unlockAudio);
-
-    const socket = io("http://localhost:5000", {
+    const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
+    socketRef.current = io(SOCKET_URL, {
       transports: ["websocket"],
     });
+    socketRef.current.on("connect", () => {
+      console.log("✅ Socket connected");
+    });
 
-    socket.on("new-order", (data) => {
+    socketRef.current.on("new-order", (data) => {
       setNewOrdersCount((prev) => prev + 1);
-
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
@@ -47,9 +47,14 @@ export const OrderNotificationProvider = ({ children }) => {
 
       toast.success(`🛒 New Order ₹${data.total} received`);
     });
+    socketRef.current.on("disconnect", () => {
+      console.log("❌ Socket disconnected");
+    });
 
     return () => {
-      socket.disconnect();
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
     };
   }, []);
 

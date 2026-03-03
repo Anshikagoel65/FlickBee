@@ -48,10 +48,8 @@ export default function Login() {
         className="bg-white p-6 rounded shadow-md w-80"
       >
         <h2 className="text-xl font-bold mb-4 text-center">
-          FlickBee Admin Login
+          FlickBees Admin Login
         </h2>
-
-        {/* Email */}
         <input
           type="email"
           placeholder="Email"
@@ -60,7 +58,6 @@ export default function Login() {
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        {/* Password with Eye */}
         <div className="relative mb-4">
           <input
             type={showPassword ? "text" : "password"}

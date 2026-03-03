@@ -1,15 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const SERVER_URL = import.meta.env.VITE_SOCKET_URL;
 const HeroBanners = () => {
   const [open, setOpen] = useState(false);
   const [image, setImage] = useState(null);
   const [banners, setBanners] = useState([]);
-
-  // Fetch banners
   const fetchBanners = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/banners");
+      const res = await fetch(`${API_BASE}/banners`);
       const data = await res.json();
       setBanners(data);
     } catch (error) {
@@ -28,7 +28,7 @@ const HeroBanners = () => {
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/banners/${id}`, {
+      const res = await fetch(`${API_BASE}/banners/${id}`, {
         method: "DELETE",
       });
 
@@ -37,7 +37,6 @@ const HeroBanners = () => {
         return;
       }
 
-      // refresh banners
       fetchBanners();
     } catch (err) {
       console.error(err);
@@ -51,7 +50,7 @@ const HeroBanners = () => {
     formData.append("banner", image);
 
     try {
-      const res = await fetch("http://localhost:5000/api/banners", {
+      const res = await fetch(`${API_BASE}/banners`, {
         method: "POST",
         body: formData,
       });
@@ -63,7 +62,7 @@ const HeroBanners = () => {
 
       setOpen(false);
       setImage(null);
-      fetchBanners(); // refresh list
+      fetchBanners();
     } catch (error) {
       console.error(error);
     }
@@ -90,11 +89,9 @@ const HeroBanners = () => {
           {banners.map((banner) => (
             <div key={banner._id} className="relative group">
               <img
-                src={`http://localhost:5000/uploads/${banner.image}`}
+                src={`${SERVER_URL}/uploads/${banner.image}`}
                 className="w-full h-40 object-cover rounded"
               />
-
-              {/* Delete Button */}
               <button
                 onClick={() => handleDelete(banner._id)}
                 className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 text-sm rounded opacity-0 group-hover:opacity-100 transition"
@@ -105,20 +102,16 @@ const HeroBanners = () => {
           ))}
         </div>
       )}
-
-      {/* Modal */}
       {open && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
           <div className="bg-white p-6 rounded w-96">
             <h2 className="text-lg font-semibold mb-4">Upload Banner</h2>
-
             <input
               type="file"
               accept="image/*"
               onChange={(e) => setImage(e.target.files[0])}
               className="mb-4"
             />
-
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setOpen(false)}

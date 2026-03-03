@@ -18,18 +18,14 @@ const Dashboard = () => {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
-
-      {/* New Orders Card */}
       <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-xl shadow mb-6 relative">
         <p className="text-sm opacity-90">New Orders</p>
         <p className="text-3xl font-bold mt-1">{newOrdersCount}</p>
-
         {newOrdersCount > 0 && (
           <span className="absolute top-3 right-3 bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
             {newOrdersCount}
           </span>
         )}
-
         {newOrdersCount > 0 && (
           <button
             onClick={() => setNewOrdersCount(0)}
@@ -39,8 +35,6 @@ const Dashboard = () => {
           </button>
         )}
       </div>
-
-      {/* Management Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((item) => (
           <div

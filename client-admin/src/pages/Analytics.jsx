@@ -1,16 +1,16 @@
 import React from "react";
-
+const POWERBI_URL = import.meta.env.VITE_POWERBI_URL;
 const Analytics = () => {
   return (
-    <div style={{ width: "100%", height: "100vh" }}>
-      <iframe
-        title="Admin Analytics Dashboard"
-        width="100%"
-        height="100%"
-        src="https://app.powerbi.com/reportEmbed?reportId=d7aff714-63fc-47e8-9653-6bc1c09da379&groupId=4a390955-96cf-4b93-aee9-94554cd1d5a6&autoAuth=true"
-        frameBorder="0"
-        allowFullScreen
-      />
+    <div className="w-full h-[calc(100vh-80px)] bg-gray-50 p-4">
+      <div className="bg-white rounded-xl shadow h-full overflow-hidden">
+        <iframe
+          title="Admin Analytics Dashboard"
+          src={POWERBI_URL}
+          className="w-full h-full border-0"
+          allowFullScreen
+        />
+      </div>
     </div>
   );
 };

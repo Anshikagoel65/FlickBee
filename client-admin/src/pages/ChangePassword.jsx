@@ -6,7 +6,6 @@ import API from "../api/axios";
 
 const ChangePassword = () => {
   const navigate = useNavigate();
-
   const [form, setForm] = useState({
     oldPassword: "",
     newPassword: "",
@@ -24,7 +23,6 @@ const ChangePassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (form.newPassword !== form.confirmPassword) {
       return toast.error("New passwords do not match");
     }
@@ -36,8 +34,6 @@ const ChangePassword = () => {
       });
 
       toast.success("Password changed successfully. Please login again.");
-
-      // logout after password change (recommended)
       setTimeout(() => {
         localStorage.removeItem("adminToken");
         localStorage.removeItem("adminInfo");
@@ -51,7 +47,6 @@ const ChangePassword = () => {
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded shadow">
       <h2 className="text-xl font-semibold mb-6">Change Password</h2>
-
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="relative">
           <input

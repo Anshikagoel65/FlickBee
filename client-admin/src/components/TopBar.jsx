@@ -18,22 +18,17 @@ const Topbar = () => {
   return (
     <>
       <header className="h-14 bg-white border-b flex items-center justify-between px-4">
-        {/* Left side */}
         <div className="flex items-center gap-3">
-          {/* Mobile menu button */}
           <button
             onClick={() => setOpen(true)}
             className="p-2 rounded hover:bg-gray-100 md:hidden"
           >
             <Menu size={20} />
           </button>
-
           <h1 className="font-bold text-green-600 hidden md:block">
-            FlickBee Admin
+            FlickBees Admin
           </h1>
         </div>
-
-        {/* Right side */}
         <div className="flex items-center gap-4">
           {adminInfo && (
             <span className="text-sm text-gray-600 hidden sm:block">

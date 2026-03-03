@@ -4,10 +4,8 @@ const API = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
-// Automatically attach token
 API.interceptors.request.use((req) => {
   const token = localStorage.getItem("adminToken");
-
   if (token) {
     req.headers.Authorization = `Bearer ${token}`;
   }

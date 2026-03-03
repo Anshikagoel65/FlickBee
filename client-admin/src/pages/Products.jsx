@@ -20,14 +20,14 @@ const productTypes = [
   "others",
 ];
 
+const SERVER_URL = import.meta.env.VITE_SOCKET_URL;
+
 const Products = () => {
-  /* ================= STATES ================= */
   const [allProducts, setAllProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [editingId, setEditingId] = useState(null);
-
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -44,8 +44,6 @@ const Products = () => {
   const [images, setImages] = useState([]);
   const [preview, setPreview] = useState([]);
 
-  /* ================= LOAD ================= */
-
   useEffect(() => {
     const init = async () => {
       const [catRes, prodRes] = await Promise.all([
@@ -61,15 +59,11 @@ const Products = () => {
     init();
   }, []);
 
-  /* ================= IMAGE ================= */
-
   const handleImage = (e) => {
     const files = Array.from(e.target.files);
     setImages(files);
     setPreview(files.map((f) => URL.createObjectURL(f)));
   };
-
-  /* ================= VARIANT ================= */
 
   const addVariant = () => {
     setVariants([
@@ -87,8 +81,6 @@ const Products = () => {
     updated[index][field] = value;
     setVariants(updated);
   };
-
-  /* ================= EDIT ================= */
 
   const editProduct = (p) => {
     setEditingId(p._id);
@@ -115,15 +107,13 @@ const Products = () => {
     );
 
     if (p.images?.length) {
-      setPreview(p.images.map((img) => `http://localhost:5000${img}`));
+      setPreview(p.images.map((img) => `${SERVER_URL}${img}`));
     } else {
       setPreview([]);
     }
 
     setImages([]);
   };
-
-  /* ================= SAVE ================= */
 
   const saveProduct = async () => {
     if (
@@ -149,7 +139,7 @@ const Products = () => {
     const formData = new FormData();
     formData.append("name", form.name);
     formData.append("description", form.description);
-    formData.append("brandName", form.brandName); // optional
+    formData.append("brandName", form.brandName);
     formData.append("category", form.category);
     formData.append("productType", form.productType);
     formData.append("taxPercent", Number(form.taxPercent) || 0);
@@ -173,8 +163,6 @@ const Products = () => {
     }
   };
 
-  /* ================= RESET ================= */
-
   const resetForm = () => {
     setEditingId(null);
     setForm({
@@ -194,8 +182,6 @@ const Products = () => {
     setPreview([]);
   };
 
-  /* ================= DELETE ================= */
-
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this product?")) return;
     await deleteProduct(id);
@@ -203,8 +189,6 @@ const Products = () => {
     setProducts(res || []);
     setAllProducts(res || []);
   };
-
-  /* ================= SEARCH ================= */
 
   const handleSearch = (value) => {
     setSearch(value);
@@ -221,13 +205,9 @@ const Products = () => {
     setProducts(filtered);
   };
 
-  /* ================= UI ================= */
-
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Products</h1>
-
-      {/* FORM */}
       <div className="bg-white p-6 rounded-xl shadow mb-8">
         <input
           placeholder="Enter product name"
@@ -283,7 +263,6 @@ const Products = () => {
         />
       </div>
 
-      {/* VARIANTS */}
       <div className="bg-white p-6 rounded-xl shadow mb-8">
         <div className="flex justify-between mb-4">
           <h2 className="font-semibold">Variants</h2>
@@ -349,7 +328,6 @@ const Products = () => {
         ))}
       </div>
 
-      {/* IMAGES */}
       <div className="bg-white p-6 rounded-xl shadow mb-8">
         <label className="border-2 border-dashed p-6 flex flex-col items-center cursor-pointer text-gray-500">
           <Upload />
@@ -376,7 +354,6 @@ const Products = () => {
         {editingId ? "Update Product" : "Save Product"}
       </button>
 
-      {/* SEARCH */}
       <input
         type="text"
         placeholder="Search product..."
@@ -385,13 +362,12 @@ const Products = () => {
         className="border px-4 py-2 mt-4 w-full rounded"
       />
 
-      {/* LIST */}
       <h2 className="text-xl font-bold mt-10 mb-4">Products</h2>
       <div className="grid grid-cols-3 gap-4">
         {products.map((p) => (
           <div key={p._id} className="bg-white p-4 rounded shadow">
             <img
-              src={`http://localhost:5000${p.thumbnail}`}
+              src={`${SERVER_URL}${p.thumbnail}`}
               alt=""
               className="h-32 w-full object-cover rounded"
             />

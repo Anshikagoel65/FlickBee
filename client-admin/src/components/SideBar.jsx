@@ -17,7 +17,7 @@ const Sidebar = () => {
   return (
     <aside className="w-64 bg-white border-r min-h-screen p-4">
       <h2 className="text-2xl font-bold text-green-600 mb-8">
-        FlickBee <span className="text-gray-800">Admin</span>
+        FlickBees <span className="text-gray-800">Admin</span>
       </h2>
 
       <nav className="space-y-2">
@@ -134,7 +134,6 @@ const Sidebar = () => {
           Orders
         </NavLink>
 
-        {/* NEW Change Password */}
         <NavLink
           to="/change-password"
           className={({ isActive }) =>

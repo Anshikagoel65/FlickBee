@@ -22,13 +22,12 @@ function App() {
 
   useEffect(() => {
     audioRef.current = new Audio("/notification.mp3");
-
-    const socket = io("http://localhost:5000", {
+    const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
+    const socket = io(SOCKET_URL, {
       transports: ["websocket"],
     });
 
     socket.on("new-order", (data) => {
-      // 🔔 play sound everywhere
       audioRef.current.play().catch(() => {});
 
       toast(
@@ -55,10 +54,7 @@ function App() {
       <ToastContainer position="top-right" autoClose={5000} />
 
       <Routes>
-        {/* Login route */}
         <Route path="/login" element={<Login />} />
-
-        {/* Protected Admin Routes */}
         <Route
           path="/"
           element={
