@@ -23,11 +23,43 @@ router.post("/", authMiddleware, async (req, res) => {
       });
     }
 
+    if (!items || !items.length) {
+      return res.status(400).json({
+        message: "Order items are required",
+      });
+    }
+
+    for (const item of items) {
+      const product = await Product.findById(item.productId);
+
+      if (!product) {
+        return res.status(404).json({
+          message: "Product not found",
+        });
+      }
+
+      const variant = product.variants.id(item.variantId);
+
+      if (!variant) {
+        return res.status(404).json({
+          message: "Variant not found",
+        });
+      }
+
+      if (variant.stock < item.quantity) {
+        return res.status(400).json({
+          message: `${product.name} is out of stock`,
+        });
+      }
+      variant.stock -= item.quantity;
+      product.isAvailable = product.variants.some((v) => v.stock > 0);
+      await product.save();
+    }
+
     const order = await Order.create({
       userId: req.user._id,
       storeId: "default-store",
       addressId,
-
       items,
       itemTotal,
       taxAmount,
