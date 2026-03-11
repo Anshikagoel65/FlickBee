@@ -23,8 +23,7 @@ const allowedOrigins = [
   "https://www.flickbees.in",
   "https://flickbees.com",
   "https://www.flickbees.com",
-  "http://flickbee-admin.s3-website-us-east-1.amazonaws.com",
-  "https://d19u6bsecq9t1d.cloudfront.net",
+  "https://admin.flickbees.in",
   "http://localhost:3000",
   "http://localhost:5173",
 ];
