@@ -1,15 +1,20 @@
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
+import { Heart } from "lucide-react";
+import { useWishlist } from "../context/WishlistContext";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
 
 const ProductCard = ({ product, variant = "carousel" }) => {
   const navigate = useNavigate();
   const { cart, addToCart, removeFromCart } = useCart();
-  const firstVariant = product.variants?.[0];
-  const hasStock = product.variants?.some(
+  const { wishlist, toggleWishlist } = useWishlist();
+  const isWishlisted = wishlist[product._id];
+  const availableVariant = product.variants?.find(
     (v) => Number(v.stock) > 0 && v.isAvailable !== false,
   );
+  const firstVariant = availableVariant || product.variants?.[0];
+  const hasStock = !!availableVariant;
   const isOutOfStock = !hasStock;
   const getQuantity = () => {
     if (!firstVariant) return 0;
@@ -28,8 +33,24 @@ const ProductCard = ({ product, variant = "carousel" }) => {
   return (
     <div
       onClick={() => navigate(`/product/${product._id}`)}
-      className="relative bg-white border rounded-2xl p-3 cursor-pointer transition hover:shadow-md flex-shrink-0 w-[250px] h-[300px] snap-start"
+      className={`relative bg-white border rounded-2xl p-3 cursor-pointer transition hover:shadow-md h-[300px] ${
+        variant === "carousel" ? "flex-shrink-0 w-[250px] snap-start" : "w-full"
+      }`}
     >
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleWishlist(product);
+        }}
+        className="absolute top-2 left-2 bg-white rounded-full p-2 shadow hover:scale-110 transition z-20"
+      >
+        <Heart
+          size={18}
+          className={
+            isWishlisted ? "fill-red-500 text-red-500" : "text-gray-400"
+          }
+        />
+      </button>
       {discountPercent > 0 && (
         <span className="absolute top-2 right-2 z-20 bg-yellow-400 text-black text-sm font-semibold px-2 py-0.5 rounded-md shadow">
           Save {discountPercent}%

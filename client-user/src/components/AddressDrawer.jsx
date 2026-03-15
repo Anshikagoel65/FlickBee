@@ -6,6 +6,7 @@ import AddressModal from "./AddressModal";
 import { useCart } from "../context/CartContext";
 import { placeOrder } from "../services/orderApi";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const getTypeIcon = (type) => {
   switch (type) {
@@ -59,17 +60,18 @@ const AddressDrawer = () => {
 
   const handleProceedToPay = async () => {
     if (!selectedAddressId) {
-      alert("Please select an address");
+      toast.error("Please select an address");
       return;
     }
 
     if (!selectedPaymentMethod) {
-      alert("Please select a payment method");
+      toast.error("Please select a payment method");
       return;
     }
 
     const items = Object.values(cart).map((item) => ({
-      productId: item._id,
+      productId: item.productId || item._id || item.product?._id,
+      variantId: item.variantId || null,
       name: item.name,
       price: item.price,
       mrp: item.mrp,
@@ -82,21 +84,34 @@ const AddressDrawer = () => {
       isSubstituted: false,
     }));
 
-    await placeOrder({
-      addressId: selectedAddressId,
-      items,
-      itemTotal: itemsTotal,
-      taxAmount: 0,
-      deliveryFee: deliveryCharge,
-      discount: 0,
-      grandTotal,
-      payment: {
-        method: selectedPaymentMethod,
-        status: selectedPaymentMethod === "cod" ? "pending" : "success",
-        amountPaid: grandTotal,
-        paidAt: selectedPaymentMethod !== "cod" ? new Date() : null,
-      },
-    });
+    try {
+      await placeOrder({
+        addressId: selectedAddressId,
+        items,
+        itemTotal: itemsTotal,
+        taxAmount: 0,
+        deliveryFee: deliveryCharge,
+        discount: 0,
+        grandTotal,
+        payment: {
+          method: selectedPaymentMethod,
+          status: selectedPaymentMethod === "cod" ? "pending" : "success",
+          amountPaid: grandTotal,
+          paidAt: selectedPaymentMethod !== "cod" ? new Date() : null,
+        },
+      });
+      toast.success("Order placed successfully 🎉");
+      clearCart();
+      setDrawerView(null);
+      navigate("/account/orders");
+    } catch (error) {
+      const msg = error?.response?.data?.message;
+      if (msg) {
+        toast.error(msg);
+      } else {
+        toast.error("Order failed. Please try again.");
+      }
+    }
 
     clearCart();
     setDrawerView(null);

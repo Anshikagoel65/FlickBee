@@ -38,7 +38,15 @@ router.post("/", authMiddleware, async (req, res) => {
         });
       }
 
-      const variant = product.variants.id(item.variantId);
+      let variant = null;
+
+      if (item.variantId && product.variants?.length) {
+        variant = product.variants.id(item.variantId);
+      }
+
+      if (!variant && product.variants?.length) {
+        variant = product.variants[0];
+      }
 
       if (!variant) {
         return res.status(404).json({
@@ -46,13 +54,24 @@ router.post("/", authMiddleware, async (req, res) => {
         });
       }
 
-      if (variant.stock < item.quantity) {
+      const orderQty = item.count || item.quantity || 1;
+
+      if (variant.stock <= 0) {
         return res.status(400).json({
           message: `${product.name} is out of stock`,
         });
       }
-      variant.stock -= item.quantity;
+
+      if (variant.stock < orderQty) {
+        return res.status(400).json({
+          message: `Requested quantity of ${product.name} is not available`,
+        });
+      }
+
+      variant.stock -= orderQty;
+
       product.isAvailable = product.variants.some((v) => v.stock > 0);
+
       await product.save();
     }
 

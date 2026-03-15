@@ -19,6 +19,7 @@ const NavBar = () => {
   const { addRecentSearch } = useSearch();
   const { cart } = useCart();
   const accountRef = useRef(null);
+  const searchRef = useRef(null);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (accountRef.current && !accountRef.current.contains(event.target)) {
@@ -49,6 +50,15 @@ const NavBar = () => {
 
   const showDeliveryTime = !!address;
 
+  useEffect(() => {
+    if (location.pathname !== "/search") {
+      setTimeout(() => {
+        searchRef.current?.blur();
+        document.activeElement?.blur();
+      }, 0);
+    }
+  }, [location.pathname]);
+
   return (
     <>
       <nav className="fixed top-0 left-0 w-full bg-white shadow-md z-50">
@@ -57,7 +67,10 @@ const NavBar = () => {
             <img
               src="/logo.png"
               alt="FlickBee Logo"
-              onClick={() => navigate("/")}
+              onClick={() => {
+                setSearchQuery("");
+                navigate("/");
+              }}
               className="h-20 cursor-pointer"
             />
             <div className="flex-1 relative">
@@ -66,12 +79,15 @@ const NavBar = () => {
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
               />
               <input
+                ref={searchRef}
                 value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
+                onFocus={() => {
                   if (location.pathname !== "/search") {
                     navigate("/search");
                   }
+                }}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
                 }}
                 onBlur={() => addRecentSearch(searchQuery)}
                 placeholder="Search for products..."
@@ -98,7 +114,10 @@ const NavBar = () => {
               <img
                 src="/logo.png"
                 alt="FlickBee Logo"
-                onClick={() => navigate("/")}
+                onClick={() => {
+                  setSearchQuery("");
+                  navigate("/");
+                }}
                 className="h-24 cursor-pointer"
               />
               <div
@@ -125,12 +144,15 @@ const NavBar = () => {
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
               />
               <input
+                ref={searchRef}
                 value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
+                onFocus={() => {
                   if (location.pathname !== "/search") {
                     navigate("/search");
                   }
+                }}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
                 }}
                 onBlur={() => addRecentSearch(searchQuery)}
                 placeholder="Search for products..."
@@ -184,6 +206,36 @@ const NavBar = () => {
                         className="block w-full text-left text-sm text-gray-600 px-4 py-3 hover:bg-gray-100"
                       >
                         Saved Addresses
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          navigate("/account/wishlist");
+                          setAccountOpen(false);
+                        }}
+                        className="block w-full text-left text-sm text-gray-600 px-4 py-3 hover:bg-gray-100 flex items-center gap-2"
+                      >
+                        My Wishlist
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          navigate("/account/faqs");
+                          setAccountOpen(false);
+                        }}
+                        className="block w-full text-left text-sm text-gray-600 px-4 py-3 hover:bg-gray-100 flex items-center gap-2"
+                      >
+                        FAQs
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          navigate("/account/about");
+                          setAccountOpen(false);
+                        }}
+                        className="block w-full text-left text-sm text-gray-600 px-4 py-3 hover:bg-gray-100 flex items-center gap-2"
+                      >
+                        About Us
                       </button>
 
                       <button
@@ -254,12 +306,15 @@ const NavBar = () => {
               className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
             />
             <input
+              ref={searchRef}
               value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
+              onFocus={() => {
                 if (location.pathname !== "/search") {
                   navigate("/search");
                 }
+              }}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
               }}
               onBlur={() => addRecentSearch(searchQuery)}
               placeholder="Search for products"

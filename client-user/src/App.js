@@ -12,6 +12,9 @@ import CategoryPage from "./pages/CategoryPage";
 import ProductPage from "./components/ProductPage";
 import { useAuthContext } from "./context/AuthContext";
 import OrderInvoice from "./pages/account/OrderInvoice";
+import Wishlist from "./pages/account/MyWishlist";
+import Faqs from "./pages/account/Faqs";
+import About from "./pages/account/About";
 
 function App() {
   const { authLoading } = useAuthContext();
@@ -34,6 +37,9 @@ function App() {
             <Route path="/account/*" element={<Account />}>
               <Route path="orders" element={<MyOrders />} />
               <Route path="addresses" element={<MyAddresses />} />
+              <Route path="wishlist" element={<Wishlist />} />
+              <Route path="faqs" element={<Faqs />} />
+              <Route path="about" element={<About />} />
               <Route path="orders/:orderId" element={<OrderInvoice />} />
             </Route>
             <Route path="/account/mobile/*" element={<AccountMobile />}>

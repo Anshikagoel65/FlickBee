@@ -1,4 +1,12 @@
-import { ArrowLeft, ClipboardList, MapPin, LogOut } from "lucide-react";
+import {
+  ArrowLeft,
+  ClipboardList,
+  MapPin,
+  LogOut,
+  Heart,
+  HelpCircle,
+  Info,
+} from "lucide-react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../context/AuthContext";
 
@@ -28,6 +36,24 @@ const AccountMobile = () => {
           icon={<MapPin />}
           label="Address Book"
           onClick={() => navigate("/account/mobile/addresses")}
+        />
+
+        <Item
+          icon={<Heart />}
+          label="My Wishlist"
+          onClick={() => navigate("/account/wishlist")}
+        />
+
+        <Item
+          icon={<HelpCircle />}
+          label="FAQs"
+          onClick={() => navigate("/account/faqs")}
+        />
+
+        <Item
+          icon={<Info />}
+          label="About Us"
+          onClick={() => navigate("/account/about")}
         />
 
         <Item

@@ -7,6 +7,8 @@ const LoginModal = () => {
   const { login, setIsLoginOpen, postLoginAction, setPostLoginAction } =
     useAuthContext();
   const [step, setStep] = useState("phone");
+  const [loading, setLoading] = useState(false);
+  const [verifyLoading, setVerifyLoading] = useState(false);
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(30);
@@ -17,15 +19,24 @@ const LoginModal = () => {
       return;
     }
 
+    setLoading(true);
+
     const toastId = toast.loading("Sending OTP...");
+
     try {
       await sendOtp(`+91${phone}`);
+
       toast.success("OTP sent successfully 📩", { id: toastId });
+
       setStep("otp");
+
       startTimer();
     } catch (err) {
-      console.error(err);
-      toast.error("Failed to send OTP", { id: toastId });
+      toast.error(err.response?.data?.message || "Failed to send OTP", {
+        id: toastId,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -34,7 +45,7 @@ const LoginModal = () => {
       toast.error("Enter valid OTP");
       return;
     }
-
+    setVerifyLoading(true);
     const toastId = toast.loading("Verifying OTP...");
     try {
       const { token, phone: userPhone } = await verifyOtp(`+91${phone}`, otp);
@@ -54,6 +65,8 @@ const LoginModal = () => {
       toast.error(err.response?.data?.message || "Invalid or expired OTP", {
         id: toastId,
       });
+    } finally {
+      setVerifyLoading(false);
     }
   };
 
@@ -98,9 +111,10 @@ const LoginModal = () => {
 
             <button
               onClick={handleSendOtp}
-              className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold"
+              disabled={loading}
+              className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold disabled:bg-gray-400"
             >
-              Send OTP
+              {loading ? "Sending..." : "Send OTP"}
             </button>
           </>
         )}
@@ -123,9 +137,10 @@ const LoginModal = () => {
 
             <button
               onClick={handleVerifyOtp}
-              className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold"
+              disabled={verifyLoading}
+              className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold disabled:bg-gray-400"
             >
-              Verify OTP
+              {verifyLoading ? "Verifying..." : "Verify OTP"}
             </button>
 
             <div className="text-center mt-3 text-sm">
@@ -134,9 +149,10 @@ const LoginModal = () => {
               ) : (
                 <button
                   className="text-green-600 font-medium"
+                  disabled={loading}
                   onClick={handleSendOtp}
                 >
-                  Resend OTP
+                  {loading ? "Sending..." : "Resend OTP"}
                 </button>
               )}
             </div>

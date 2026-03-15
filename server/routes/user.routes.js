@@ -27,6 +27,29 @@ router.get("/sections", async (req, res) => {
   res.json(sections);
 });
 
+router.get("/products/similar/:id", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    const similarProducts = await Product.find({
+      category: product.category,
+      status: "active",
+      _id: { $ne: product._id },
+    })
+      .limit(10)
+      .populate("category");
+
+    res.json(similarProducts);
+  } catch (err) {
+    console.error("SIMILAR PRODUCTS ERROR:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 router.get("/products/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id).populate("category");

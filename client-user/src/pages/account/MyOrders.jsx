@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getMyOrders } from "../../services/orderApi";
+import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import OrderRecommendations from "../../components/OrderRecommendations";
 
@@ -24,15 +25,33 @@ const MyOrders = () => {
 
   if (!orders.length) {
     return (
-      <div className="p-6 text-center text-gray-500">
-        You haven’t placed any orders yet
+      <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-4">
+        <p className="text-gray-500 text-lg">
+          You haven’t placed any orders yet
+        </p>
+
+        <button
+          onClick={() => navigate("/")}
+          className="bg-green-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-green-700"
+        >
+          Start Shopping
+        </button>
       </div>
     );
   }
 
   return (
     <div className="max-w-3xl mx-auto p-4 space-y-4">
-      <h1 className="text-2xl font-bold mb-2">My Orders</h1>
+      <div className="flex items-center gap-3 mb-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="w-9 h-9 rounded-lg border flex items-center justify-center hover:bg-gray-50"
+        >
+          <ArrowLeft size={18} />
+        </button>
+
+        <h1 className="text-2xl font-bold">My Orders</h1>
+      </div>
 
       {orders.map((order) => {
         const maxImages = 3;

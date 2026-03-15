@@ -2,6 +2,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getProductById } from "../services/productApi";
 import { useCart } from "../context/CartContext";
+import SimilarProducts from "./SimilarProducts";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
 
@@ -59,24 +60,29 @@ const ProductPage = () => {
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 pt-[80px] pb-16">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 pb-12">
         {/* IMAGE SECTION */}
-        <div>
-          <div className="w-full h-[240px] sm:h-[320px] lg:h-[420px] bg-white border rounded-xl flex items-center justify-center">
+        {/* IMAGE SECTION */}
+        <div className="flex flex-col gap-4">
+          {/* MAIN IMAGE */}
+          <div className="w-full h-[60vh] bg-white border rounded-xl flex items-center justify-center overflow-hidden">
             <img
               src={`${API_BASE}${activeImage}`}
               alt={product.name}
-              className="max-h-full object-contain"
+              className="h-full w-full object-contain transition-all duration-300"
             />
           </div>
 
-          <div className="flex gap-3 mt-4 overflow-x-auto pb-2">
+          {/* THUMBNAILS */}
+          <div className="flex gap-3 overflow-x-auto pb-2">
             {[product.thumbnail, ...(product.images || [])].map((img, i) => (
               <div
                 key={i}
                 onClick={() => setActiveImage(img)}
-                className={`w-14 h-14 sm:w-16 sm:h-16 border rounded-lg overflow-hidden cursor-pointer flex-shrink-0 ${
-                  activeImage === img ? "border-green-500" : ""
+                className={`w-16 h-16 border rounded-lg overflow-hidden cursor-pointer flex-shrink-0 transition ${
+                  activeImage === img
+                    ? "border-green-600 ring-2 ring-green-200"
+                    : "border-gray-200"
                 }`}
               >
                 <img
@@ -227,6 +233,7 @@ const ProductPage = () => {
           </div>
         </div>
       </div>
+      <SimilarProducts productId={product._id} />
     </div>
   );
 };

@@ -23,12 +23,44 @@ router.post("/send-otp", async (req, res) => {
 
     phone = normalizePhone(phone);
     const otp = generateOTP();
-    await Otp.deleteMany({ phone });
-    await Otp.create({
-      phone,
-      otp,
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-    });
+    const existing = await Otp.findOne({ phone });
+
+    const now = new Date();
+
+    if (existing) {
+      if (now - existing.dayStart > 24 * 60 * 60 * 1000) {
+        existing.dailyCount = 0;
+        existing.dayStart = now;
+      }
+      if (existing.attempts >= 3 && now - existing.lastSentAt < 5 * 60 * 1000) {
+        return res.status(429).json({
+          message: "Too many OTP requests. Try again in 5 minutes.",
+        });
+      }
+      if (existing.dailyCount >= 5) {
+        return res.status(429).json({
+          message: "Daily OTP limit reached. Try again tomorrow.",
+        });
+      }
+
+      existing.otp = otp;
+      existing.expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+      existing.attempts += 1;
+      existing.dailyCount += 1;
+      existing.lastSentAt = now;
+
+      await existing.save();
+    } else {
+      await Otp.create({
+        phone,
+        otp,
+        expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+        attempts: 1,
+        dailyCount: 1,
+        lastSentAt: now,
+        dayStart: now,
+      });
+    }
 
     await client.messages.create({
       body: `Your OTP is ${otp}. Valid for 5 minutes.`,
@@ -70,8 +102,6 @@ router.post("/verify-otp", async (req, res) => {
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
-
-    await Otp.deleteMany({ phone });
 
     res.json({
       message: "Login successful",

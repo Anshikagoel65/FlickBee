@@ -11,6 +11,16 @@
   scrollbar-width: none;
 }
 
+.no-print {
+  display: inline-flex;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
 .input {
   @apply w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-green-500;
 }

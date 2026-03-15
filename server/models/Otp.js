@@ -7,13 +7,35 @@ const otpSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+
     otp: {
       type: String,
       required: true,
     },
+
     expiresAt: {
       type: Date,
       required: true,
+    },
+
+    attempts: {
+      type: Number,
+      default: 1,
+    },
+
+    lastSentAt: {
+      type: Date,
+      default: Date.now,
+    },
+
+    dailyCount: {
+      type: Number,
+      default: 1,
+    },
+
+    dayStart: {
+      type: Date,
+      default: Date.now,
     },
   },
   { timestamps: true },

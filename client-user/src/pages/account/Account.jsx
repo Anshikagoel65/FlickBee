@@ -1,6 +1,13 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuthContext } from "../../context/AuthContext";
-import { MapPin, ClipboardList, LogOut } from "lucide-react";
+import {
+  MapPin,
+  ClipboardList,
+  LogOut,
+  Heart,
+  HelpCircle,
+  Info,
+} from "lucide-react";
 
 const Account = () => {
   const { user, logout } = useAuthContext();
@@ -31,6 +38,31 @@ const Account = () => {
             className="w-full flex gap-4 px-5 py-4 hover:bg-gray-50"
           >
             <ClipboardList size={20} /> My Orders
+          </button>
+
+          <button
+            onClick={() => navigate("/account/wishlist")}
+            className={`w-full flex gap-4 px-5 py-4 ${
+              location.pathname.includes("wishlist")
+                ? "bg-gray-100 font-medium"
+                : "hover:bg-gray-50"
+            }`}
+          >
+            <Heart size={20} /> My Wishlist
+          </button>
+
+          <button
+            onClick={() => navigate("/account/faqs")}
+            className="w-full flex gap-4 px-5 py-4 hover:bg-gray-50"
+          >
+            <HelpCircle size={20} /> FAQs
+          </button>
+
+          <button
+            onClick={() => navigate("/account/about")}
+            className="w-full flex gap-4 px-5 py-4 hover:bg-gray-50"
+          >
+            <Info size={20} /> About Us
           </button>
 
           <button
